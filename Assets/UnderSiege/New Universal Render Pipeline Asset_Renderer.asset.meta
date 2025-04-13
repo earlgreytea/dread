@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: db1e440e33f95524eab4b20b9375fcd5
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 294998
+  packageName: cyberpunk - Under Siege 1 (URP)
+  packageVersion: 1.0
+  assetPath: Assets/UnderSiege/New Universal Render Pipeline Asset_Renderer.asset
+  uploadId: 698014

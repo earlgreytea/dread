@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5976867411b4a9243ba620b2d11c7b87
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 294998
+  packageName: cyberpunk - Under Siege 1 (URP)
+  packageVersion: 1.0
+  assetPath: Assets/UnderSiege/Animation/Turret2.controller
+  uploadId: 698014

@@ -1,0 +1,17 @@
+Under Siege (URP):
+
+Quick start:
+1. Drag and drop to your own scene prefab Response Area, stored here: \UnderSiege\Prefab\_System
+2. Drag and drop any turret (Turret3 for example) from \UnderSiege\Prefab\_Turret
+3. Turret must be placed inside Response Area wire sphere
+4. Make new empty gameobject (Ctrl+Shift+N)
+5. Add component USTraffic on it
+6. Add Enemy prefabs from \UnderSiege\Prefab\_Enemy to vehicle array variety
+7. Right click on created gameobject - create empty
+8. Adjust direction for new (child) gameobject. Make sure this gameobject directs to response area wire sphere.
+9. Principled action ready. 
+Hit play for preview.
+
+Full documentation: https://ilonion.com/undersiegeunity
+
+IL.ranch, 2021-2024.

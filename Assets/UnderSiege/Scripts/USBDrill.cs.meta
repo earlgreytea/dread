@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 8a3083e9dafd3364cb1b2b355e7b46f8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 294998
+  packageName: cyberpunk - Under Siege 1 (URP)
+  packageVersion: 1.0
+  assetPath: Assets/UnderSiege/Scripts/USBDrill.cs
+  uploadId: 698014

@@ -1,0 +1,7 @@
+{
+  "description": "このプロジェクトはUnity6 + URPを使用して開発された宇宙戦艦タワーディフェンスゲームです。プレイヤーは大型艦を配置し、迎撃しながら資源と防衛ラインを管理します。",
+  "languages": ["C#", "HLSL"],
+  "tools": ["Unity", "URP"],
+  "frameworks": ["Odin Inspector"],
+  "instructions": "命名規則はC#の標準に従ってPascalCaseを使用。Unity 6以降のAPIを前提とし、最新の記述方法を使う。ShaderはURP互換で記述する。"
+}

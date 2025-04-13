@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 9ad41c4ebaa6cba498641b41d434d5df
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 294998
+  packageName: cyberpunk - Under Siege 1 (URP)
+  packageVersion: 1.0
+  assetPath: Assets/UnderSiege/Scripts/USDamageRadiusVisual.cs
+  uploadId: 698014

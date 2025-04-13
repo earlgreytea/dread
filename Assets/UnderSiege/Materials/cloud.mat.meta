@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3b957efe1b2bc614d8c79a3d8380d88f
+timeCreated: 1445962059
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 294998
+  packageName: cyberpunk - Under Siege 1 (URP)
+  packageVersion: 1.0
+  assetPath: Assets/UnderSiege/Materials/cloud.mat
+  uploadId: 698014
