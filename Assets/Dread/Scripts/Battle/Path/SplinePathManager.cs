@@ -16,8 +16,8 @@ namespace Dread.Battle.Path
         [SerializeField]
         private bool showGizmos = true;
 
-        [SerializeField, ColorPalette]
-        private Color pathColor = Color.green;
+        [SerializeField]
+        private Color pathColor = Color.red;
 
         private static SplinePathManager instance;
 

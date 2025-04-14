@@ -127,7 +127,7 @@ namespace Dread.Battle.Character
         /// <summary>
         /// デバッグ表示用のGizmo描画
         /// </summary>
-        protected virtual void OnDrawGizmos()
+        protected virtual void OnDrawGizmosSelected()
         {
             // コリジョン用の球体を描画
             Gizmos.color = Color.red * 0.8f;

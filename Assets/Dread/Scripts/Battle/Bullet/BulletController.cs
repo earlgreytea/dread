@@ -4,6 +4,7 @@ using Dread.Battle.Character;
 using System.Linq;
 using Dread.Battle.Fx;
 using Dread.Battle.Collision;
+using Sirenix.OdinInspector;
 
 namespace Dread.Battle.Bullet
 {
@@ -327,6 +328,13 @@ namespace Dread.Battle.Bullet
 
             // アクティブな弾の数を増やす
             activeBulletCount++;
+            ActiveBulletCount = activeBulletCount;
+
+            // 瞬間最大弾数を更新
+            if (activeBulletCount > PeakBulletCount)
+            {
+                PeakBulletCount = activeBulletCount;
+            }
         }
 
         /// <summary>
@@ -339,6 +347,7 @@ namespace Dread.Battle.Bullet
                 bullets[index].Deactivate();
                 availableBulletIndices.Enqueue(index);
                 activeBulletCount--;
+                ActiveBulletCount = activeBulletCount;
             }
         }
 
@@ -360,77 +369,23 @@ namespace Dread.Battle.Bullet
             }
 
             activeBulletCount = 0;
+            ActiveBulletCount = 0;
         }
 
         /// <summary>
-        /// アクティブな弾の数を取得するプロパティ
+        /// アクティブな弾の数を取得するプロパティ（読み取り専用）
         /// </summary>
-        public int ActiveBulletCount => activeBulletCount;
+        [BoxGroup("弾の状態")]
+        [ReadOnly]
+        [ShowInInspector]
+        public int ActiveBulletCount { get; private set; }
 
         /// <summary>
-        /// ギズモ表示用の設定
+        /// 瞬間最大弾数を取得するプロパティ（読み取り専用）
         /// </summary>
-        [Header("ギズモ設定")]
-        [SerializeField]
-        private bool showBulletGizmos = true;
-
-        [SerializeField]
-        private Color normalBulletGizmoColor = Color.yellow;
-
-        [SerializeField]
-        private Color piercingBulletGizmoColor = Color.cyan;
-
-        [SerializeField]
-        private Color explosiveBulletGizmoColor = Color.red;
-
-        /// <summary>
-        /// ギズモ描画処理
-        /// </summary>
-        private void OnDrawGizmosSelected()
-        {
-            if (!showBulletGizmos || bullets == null)
-                return;
-
-            // アクティブな弾のみを表示
-            for (int i = 0; i < maxBullets; i++)
-            {
-                if (bullets[i].isActive)
-                {
-                    // 弾の種類によって色を変える
-                    Color gizmoColor;
-                    switch (bullets[i].type)
-                    {
-                        case BulletType.Piercing:
-                            gizmoColor = piercingBulletGizmoColor;
-                            break;
-                        case BulletType.Explosive:
-                            gizmoColor = explosiveBulletGizmoColor;
-                            break;
-                        default:
-                            gizmoColor = normalBulletGizmoColor;
-                            break;
-                    }
-
-                    Gizmos.color = gizmoColor;
-
-                    // 弾の位置に球を描画
-                    Gizmos.DrawSphere(bullets[i].position, bullets[i].size * 0.5f);
-
-                    // 弾の進行方向を矢印で表示
-                    Gizmos.DrawRay(
-                        bullets[i].position,
-                        bullets[i].direction * bullets[i].speed * 0.2f
-                    );
-
-                    // 最大飛距離を点線で表示
-                    if (bullets[i].type == BulletType.Explosive)
-                    {
-                        // 爆発弾の場合は爆発範囲も表示
-                        Gizmos.color = new Color(gizmoColor.r, gizmoColor.g, gizmoColor.b, 0.2f);
-                        Gizmos.DrawWireSphere(bullets[i].position, 3f); // 爆発半径
-                    }
-                }
-            }
-        }
+        [BoxGroup("弾の状態")]
+        [ReadOnly]
+        [ShowInInspector]
+        public int PeakBulletCount { get; private set; }
     }
 }

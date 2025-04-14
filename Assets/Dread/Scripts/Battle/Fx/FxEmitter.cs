@@ -220,12 +220,14 @@ namespace Dread.Battle.Fx
         }
 
         /// <summary>
-        /// 指定したエフェクトタイプのParticleSystemを発生させる
+        /// 指定したタイプのParticleSystemを発生させる
         /// </summary>
-        /// <param name="type">エフェクトタイプ</param>
-        /// <param name="count">発生させるパーティクル数</param>
-        /// <returns>成功したかどうか</returns>
-        public bool EmitByType(FxType type, Vector3 position, Vector3 direction, int count = 1)
+        /// <param name="type"></param>
+        /// <param name="position"></param>
+        /// <param name="velocity"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public bool EmitByType(FxType type, Vector3 position, Vector3 velocity, int count = 1)
         {
             if (!_initialized)
                 Initialize();
@@ -242,7 +244,7 @@ namespace Dread.Battle.Fx
                         position = position,
                         applyShapeToPosition = true,
                         // 方向を指定します
-                        velocity = direction
+                        velocity = velocity
                     };
 
                     ps.Emit(emitParams, count);

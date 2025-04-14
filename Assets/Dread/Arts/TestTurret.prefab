@@ -80,16 +80,18 @@ MonoBehaviour:
   barrel: {fileID: 323959298563219977}
   muzzle: {fileID: 4599062218274311866}
   target: {fileID: 0}
+  targetingMethod: 1
   rotationSpeed: 5
   horizontalAngleLimit: 60
   verticalAngleLimit: 60
-  bulletSpeed: 100
+  bulletSpeed: 150
   bulletDamage: 10
-  bulletLifetime: 3
+  bulletLifetime: 2
   bulletMaxDistance: 300
-  bulletSize: 0.3
+  bulletSize: 1
+  effectiveRange: 150
   bulletType: 0
-  fireRate: 6
+  fireRate: 10
   accuracy: 0.5
 --- !u!1001 &319996064882980147
 PrefabInstance:

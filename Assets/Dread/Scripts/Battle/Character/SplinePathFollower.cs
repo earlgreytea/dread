@@ -29,6 +29,13 @@ namespace Dread.Battle.Character
         [SerializeField]
         private float rotationSpeed = 10f;
 
+        [Header("パスオフセット")]
+        [SerializeField, Tooltip("パスの進行方向に対する右方向のオフセット")]
+        private float rightOffset = 0f;
+
+        [SerializeField, Tooltip("パスの進行方向に対する上方向のオフセット")]
+        private float upOffset = 0f;
+
         // 内部状態
         private SplineContainer currentSplineContainer;
         private Spline currentSpline;
@@ -167,9 +174,23 @@ namespace Dread.Battle.Character
 
             // パス上の位置を取得
             float t = Mathf.Clamp01(currentDistance); // 0～1の間の値に制限
-            Vector3 newPosition = currentSplineContainer.transform.TransformPoint(
-                currentSpline.EvaluatePosition(t)
-            );
+            Vector3 pathPosition = currentSpline.EvaluatePosition(t);
+
+            // パスの進行方向を計算
+            // float3型をVector3型に変換して正規化
+            Vector3 tangent = (Vector3)currentSpline.EvaluateTangent(t);
+            tangent = tangent.normalized;
+
+            // 進行方向からright方向とup方向を計算
+            Vector3 up = Vector3.up;
+            Vector3 right = Vector3.Cross(tangent, up).normalized;
+            up = Vector3.Cross(right, tangent).normalized;
+
+            // オフセットを適用
+            Vector3 offsetPosition = pathPosition + (right * rightOffset) + (up * upOffset);
+
+            // ワールド座標に変換
+            Vector3 newPosition = currentSplineContainer.transform.TransformPoint(offsetPosition);
             transform.position = newPosition;
 
             // 進行方向を向く
@@ -180,9 +201,25 @@ namespace Dread.Battle.Character
                     ? Mathf.Max(0, t - lookAheadT)
                     : Mathf.Min(1, t + lookAheadT);
 
+                // 現在位置と少し先の位置を取得（オフセットを適用）
+                Vector3 targetPathPosition = currentSpline.EvaluatePosition(targetT);
+                Vector3 targetTangent = (
+                    (Vector3)currentSpline.EvaluateTangent(targetT)
+                ).normalized;
+
+                // 進行方向からright方向とup方向を計算（ターゲット位置用）
+                Vector3 targetUp = Vector3.up;
+                Vector3 targetRight = Vector3.Cross(targetTangent, targetUp).normalized;
+                targetUp = Vector3.Cross(targetRight, targetTangent).normalized;
+
+                // ターゲット位置にもオフセットを適用
+                Vector3 targetOffsetPosition =
+                    targetPathPosition + (targetRight * rightOffset) + (targetUp * upOffset);
                 Vector3 lookTarget = currentSplineContainer.transform.TransformPoint(
-                    currentSpline.EvaluatePosition(targetT)
+                    targetOffsetPosition
                 );
+
+                // オフセット適用後の現在位置からオフセット適用後のターゲット位置への方向を計算
                 Vector3 direction = lookTarget - newPosition;
 
                 if (direction != Vector3.zero)
@@ -241,6 +278,32 @@ namespace Dread.Battle.Character
         public void ReverseDirection()
         {
             reverseDirection = !reverseDirection;
+        }
+
+        /// <summary>
+        /// 現在の移動方向が反転しているかどうかを取得
+        /// </summary>
+        public bool IsReversed()
+        {
+            return reverseDirection;
+        }
+
+        /// <summary>
+        /// パスの右方向オフセットを取得または設定
+        /// </summary>
+        public float RightOffset
+        {
+            get => rightOffset;
+            set => rightOffset = value;
+        }
+
+        /// <summary>
+        /// パスの上方向オフセットを取得または設定
+        /// </summary>
+        public float UpOffset
+        {
+            get => upOffset;
+            set => upOffset = value;
         }
     }
 }

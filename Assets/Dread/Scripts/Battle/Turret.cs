@@ -2,6 +2,14 @@ using UnityEditor;
 using UnityEngine;
 using Dread.Battle.Bullet;
 using Dread.Battle.Fx;
+using System.Collections.Generic;
+
+// ターゲット選択方法の列挙型
+public enum TargetingMethod
+{
+    FirstFound, // 最初に見つけた敵を追跡し続ける（従来の動作）
+    NearestEnemy // 常に最も近い敵をターゲットする
+}
 
 public class Turret : MonoBehaviour
 {
@@ -17,6 +25,10 @@ public class Turret : MonoBehaviour
     // 狙いをつける対象
     [SerializeField]
     Transform target;
+
+    // ターゲット選択方法
+    [SerializeField, Tooltip("FirstFound: 最初に見つけた敵を追跡し続ける、NearestEnemy: 常に最も近い敵をターゲットする")]
+    TargetingMethod targetingMethod = TargetingMethod.NearestEnemy;
 
     [SerializeField]
     float rotationSpeed = 5f; // 回転速度
@@ -45,6 +57,10 @@ public class Turret : MonoBehaviour
 
     [SerializeField]
     float bulletSize = 0.3f; // 弾のサイズ
+    
+    [Header("有効射程設定")]
+    [SerializeField, Tooltip("この距離内に敵が存在する場合のみ発砲します。実際の弾の最大飛距離とは異なります")]
+    float effectiveRange = 150f; // 有効射程距離
 
     [SerializeField]
     BulletType bulletType = BulletType.Normal; // 弾の種類
@@ -69,19 +85,36 @@ public class Turret : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (target == null)
+        // ターゲット選択方法に応じて処理を分岐
+        switch (targetingMethod)
         {
-            FindTarget();
+            case TargetingMethod.FirstFound:
+                // 従来の動作：ターゲットがnullの場合のみ新しいターゲットを探す
+                if (target == null)
+                {
+                    FindTarget();
+                }
+                break;
+
+            case TargetingMethod.NearestEnemy:
+                // 常に最も近い敵をターゲットする
+                FindNearestTarget();
+                break;
         }
 
         if (target != null)
         {
             RotateTurret();
-            TryFireBullet();
+            
+            // 敵が射程内にいる場合のみ発砲
+            if (IsTargetInRange())
+            {
+                TryFireBullet();
+            }
         }
     }
 
-    // ターゲットを検索するメソッド
+    // 最初に見つけたターゲットを検索するメソッド（従来の動作）
     void FindTarget()
     {
         // Enemyタグを持つオブジェクトを検索
@@ -91,6 +124,38 @@ public class Turret : MonoBehaviour
         {
             target = enemyObject.transform;
         }
+    }
+
+    // 最も近いターゲットを検索するメソッド
+    void FindNearestTarget()
+    {
+        // Enemyタグを持つすべてのオブジェクトを検索
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+
+        if (enemies.Length == 0)
+        {
+            // 敵が見つからない場合はターゲットをクリア
+            target = null;
+            return;
+        }
+
+        // 最も近い敵を探す
+        Transform nearestEnemy = null;
+        float nearestDistance = float.MaxValue;
+
+        foreach (GameObject enemy in enemies)
+        {
+            float distance = Vector3.Distance(transform.position, enemy.transform.position);
+
+            if (distance < nearestDistance)
+            {
+                nearestDistance = distance;
+                nearestEnemy = enemy.transform;
+            }
+        }
+
+        // 最も近い敵をターゲットに設定
+        target = nearestEnemy;
     }
 
     // ターゲットに向けて砲塔を回転させる
@@ -164,6 +229,19 @@ public class Turret : MonoBehaviour
         );
     }
 
+    // ターゲットが有効射程内にいるかチェック
+    bool IsTargetInRange()
+    {
+        if (target == null)
+            return false;
+            
+        // ターゲットとの距離を計算
+        float distanceToTarget = Vector3.Distance(transform.position, target.position);
+        
+        // 有効射程内にいるかどうかを返す
+        return distanceToTarget <= effectiveRange;
+    }
+    
     // 弾を発射する処理
     void TryFireBullet()
     {
@@ -245,6 +323,10 @@ public class Turret : MonoBehaviour
 
             // ラインの終点に小さな球を描画
             Gizmos.DrawSphere(lineEnd, 0.2f);
+            
+            // 有効射程範囲を表すワイヤー球を描画
+            Gizmos.color = new Color(0.5f, 0.5f, 1f, 0.3f); // 青色半透明
+            Gizmos.DrawWireSphere(transform.position, effectiveRange);
         }
     }
     #endregion

@@ -86,6 +86,23 @@ namespace Dread.Battle.Character
         }
 
         /// <summary>
+        /// 更新処理
+        /// </summary>
+        protected override void Update()
+        {
+            base.Update();
+
+            if (isActive && IsAlive)
+            {
+                // 敵の更新処理
+                UpdateEnemy();
+
+                // パスの終端に到達したかチェック
+                CheckPathEnd();
+            }
+        }
+
+        /// <summary>
         /// 敵の更新処理
         /// </summary>
         protected override void UpdateEnemy()
@@ -164,6 +181,9 @@ namespace Dread.Battle.Character
         {
             base.Die();
 
+            // 移動速度ベクトルを取得
+            Vector3 velocityVector = GetVelocity();
+
             // パスフォロワーを停止
             if (pathFollower != null)
             {
@@ -171,13 +191,16 @@ namespace Dread.Battle.Character
             }
 
             // SimpleEnemy固有の死亡処理
-            // 例：パーティクルエフェクトの再生など
+            // 爆発エフェクトの再生（移動速度ベクトルを渡す）
             FxEmitter.Instance.EmitByType(
                 FxType.ExplosionFlash,
                 transform.position,
-                transform.forward,
+                velocityVector,
                 3
             );
+
+            // 敵を即座に破棄
+            Destroy(gameObject);
         }
 
         /// <summary>
@@ -193,8 +216,37 @@ namespace Dread.Battle.Character
         }
 
         /// <summary>
-        /// パスを設定
+        /// パスの終端に到達したかチェックし、到達していれば消滅させる
         /// </summary>
+        private void CheckPathEnd()
+        {
+            if (pathFollower != null && pathFollower.HasReachedEnd)
+            {
+                // パスの終端に到達したら消滅
+                Deactivate();
+
+                // 敵オブジェクトを完全に破棄
+                Destroy(gameObject);
+            }
+        }
+
+        /// <summary>
+        /// 敵の現在の移動速度ベクトルを取得
+        /// </summary>
+        /// <returns>移動速度ベクトル</returns>
+        private Vector3 GetVelocity()
+        {
+            // パスフォロワーがある場合は、その進行方向と速度から計算
+            if (pathFollower != null && pathFollower.IsMoving)
+            {
+                // 進行方向（前方ベクトル）に速度を掛けて速度ベクトルを作成
+                return transform.forward * pathFollower.MoveSpeed;
+            }
+
+            // パスフォロワーがない場合や移動していない場合は前方向を返す
+            return transform.forward;
+        }
+
         public void SetPath(int newPathIndex, bool resetPosition = true)
         {
             pathIndex = newPathIndex;
