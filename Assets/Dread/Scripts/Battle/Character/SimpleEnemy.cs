@@ -1,6 +1,7 @@
 using UnityEngine;
 using Dread.Battle.Path;
 using UnityEngine.Splines;
+using Dread.Battle.Fx;
 
 namespace Dread.Battle.Character
 {
@@ -171,6 +172,12 @@ namespace Dread.Battle.Character
 
             // SimpleEnemy固有の死亡処理
             // 例：パーティクルエフェクトの再生など
+            FxEmitter.Instance.EmitByType(
+                FxType.ExplosionFlash,
+                transform.position,
+                transform.forward,
+                3
+            );
         }
 
         /// <summary>
