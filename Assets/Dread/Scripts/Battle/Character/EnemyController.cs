@@ -2,36 +2,15 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using Sirenix.OdinInspector;
+using Dread.Battle.Util;
 
 namespace Dread.Battle.Character
 {
     /// <summary>
     /// ゲーム中のEnemyを管理するコントローラークラス
     /// </summary>
-    public class EnemyController : MonoBehaviour
+    public class EnemyController : SingletonMonoBehaviour<EnemyController>
     {
-        // シングルトンインスタンス
-        private static EnemyController _instance;
-
-        /// <summary>
-        /// シングルトンインスタンスへのアクセスプロパティ
-        /// </summary>
-        public static EnemyController Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = FindFirstObjectByType<EnemyController>();
-                    if (_instance == null)
-                    {
-                        Debug.LogError("シーン内にEnemyControllerが見つかりません。");
-                    }
-                }
-                return _instance;
-            }
-        }
-
         // 敵キャラクターのリスト
         [ShowInInspector, ReadOnly, ListDrawerSettings(ShowIndexLabels = true, ShowPaging = true)]
         [FoldoutGroup("登録済みの敵"), LabelText("登録済みの敵一覧")]
@@ -41,15 +20,10 @@ namespace Dread.Battle.Character
         /// <summary>
         /// 初期化処理
         /// </summary>
-        private void Awake()
+        protected override void Awake()
         {
-            // シングルトンの設定
-            if (_instance != null && _instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            _instance = this;
+            // シングルトンの初期化を行う
+            base.Awake();
 
             // シーン内の既存のEnemyを検索して登録
             RegisterExistingEnemies();

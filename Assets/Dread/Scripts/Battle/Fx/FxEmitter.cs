@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using Dread.Battle.Util;
 
 namespace Dread.Battle.Fx
 {
@@ -25,13 +26,8 @@ namespace Dread.Battle.Fx
     /// 主にParticleSystemの発生などを管理
     /// 子階層に、ParticleSystemオブジェクトを多数持つ
     /// </summary>
-    public class FxEmitter : MonoBehaviour
+    public class FxEmitter : SingletonMonoBehaviour<FxEmitter>
     {
-        /// <summary>
-        /// シングルトンインスタンス
-        /// </summary>
-        public static FxEmitter Instance { get; private set; }
-
         // エフェクトの種類を直接名前として使用する
 
         // 実際に使用するParticleSystemのリスト
@@ -51,19 +47,10 @@ namespace Dread.Battle.Fx
         // 初期化済みフラグ
         private bool _initialized = false;
 
-        private void Awake()
+        protected override void Awake()
         {
-            // シングルトンの設定
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else if (Instance != this)
-            {
-                Debug.LogWarning("FxEmitterのインスタンスが複数存在します。" + gameObject.name + "を破棄します。");
-                Destroy(gameObject);
-                return;
-            }
+            // シングルトンの初期化を行う
+            base.Awake();
 
             transform.position = Vector3.zero;
 

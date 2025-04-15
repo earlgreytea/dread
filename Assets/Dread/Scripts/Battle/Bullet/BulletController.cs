@@ -4,6 +4,7 @@ using Dread.Battle.Character;
 using System.Linq;
 using Dread.Battle.Fx;
 using Dread.Battle.Collision;
+using Dread.Battle.Util;
 using Sirenix.OdinInspector;
 
 namespace Dread.Battle.Bullet
@@ -11,30 +12,8 @@ namespace Dread.Battle.Bullet
     /// <summary>
     /// ゲーム中のアクティブな弾配列を管理するクラス
     /// </summary>
-    public class BulletController : MonoBehaviour
+    public class BulletController : SingletonMonoBehaviour<BulletController>
     {
-        // シングルトンインスタンス
-        private static BulletController _instance;
-
-        /// <summary>
-        /// シングルトンインスタンスへのアクセスプロパティ
-        /// </summary>
-        public static BulletController Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = FindFirstObjectByType<BulletController>();
-                    if (_instance == null)
-                    {
-                        Debug.LogError("シーン内にBulletControllerが見つかりません。");
-                    }
-                }
-                return _instance;
-            }
-        }
-
         // 弾の最大数
         [SerializeField]
         private int maxBullets = 1000;
@@ -55,15 +34,11 @@ namespace Dread.Battle.Bullet
         /// <summary>
         /// 初期化処理
         /// </summary>
-        private void Awake()
+        protected override void Awake()
         {
-            // シングルトンの設定
-            if (_instance != null && _instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            _instance = this;
+            // シングルトンの初期化を行う
+            base.Awake();
+
             // 弾の配列を初期化
             bullets = new Bullet[maxBullets];
 

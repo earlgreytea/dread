@@ -1,0 +1,13 @@
+root = true
+
+[*.cs]
+# IDE0130: 名前空間宣言を別の名前空間に一致させる
+dotnet_diagnostic.IDE0130.severity = none
+
+# IDE0090: 'new()' の使用
+dotnet_diagnostic.IDE0090.severity = none
+
+# 他の設定も必要に応じて追加できます
+
+# IDE0017: オブジェクト初期化子を使用する
+dotnet_diagnostic.IDE0017.severity = none

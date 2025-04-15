@@ -2,13 +2,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Splines;
 using Sirenix.OdinInspector;
+using Dread.Battle.Util;
 
 namespace Dread.Battle.Path
 {
     /// <summary>
     /// UnityのSplineContainerを使用してスプラインパスを管理するマネージャークラス
     /// </summary>
-    public class SplinePathManager : MonoBehaviour
+    public class SplinePathManager : SingletonMonoBehaviour<SplinePathManager>
     {
         [SerializeField, ListDrawerSettings(ShowFoldout = true)]
         private List<SplineContainer> splinePaths = new List<SplineContainer>();
@@ -19,28 +20,6 @@ namespace Dread.Battle.Path
         [SerializeField]
         private Color pathColor = Color.red;
 
-        private static SplinePathManager instance;
-
-        /// <summary>
-        /// シングルトンインスタンス
-        /// </summary>
-        public static SplinePathManager Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = FindFirstObjectByType<SplinePathManager>();
-                    if (instance == null)
-                    {
-                        GameObject obj = new GameObject("SplinePathManager");
-                        instance = obj.AddComponent<SplinePathManager>();
-                    }
-                }
-                return instance;
-            }
-        }
-
         /// <summary>
         /// 利用可能なパスの数を取得
         /// </summary>
@@ -49,10 +28,10 @@ namespace Dread.Battle.Path
         /// <summary>
         /// 初期化処理
         /// </summary>
-        private void Awake()
+        protected override void Awake()
         {
-            // シングルトンインスタンスの設定
-            instance = this;
+            // シングルトンの初期化を行う
+            base.Awake();
         }
 
         /// <summary>
@@ -91,13 +70,7 @@ namespace Dread.Battle.Path
         /// </summary>
         private void Start()
         {
-            if (instance != null && instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            instance = this;
+            // シングルトンの初期化はAwakeで行われるため、ここでは特に何もしない
         }
 
         /// <summary>
