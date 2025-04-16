@@ -1021,6 +1021,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: F3_Green Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 8272937278459543875, guid: 1b9c9bd520ad54747a98d7222069677a, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 257
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1953,7 +1957,6 @@ MonoBehaviour:
   saveDirectory: Screenshots
   fileNamePrefix: SS
   resolutionMultiplier: 1
-  sceneViewResolutionMultiplier: 4
   hideUI: 1
 --- !u!1 &686792546
 GameObject:
