@@ -44,12 +44,6 @@ namespace Dread.Util
         private int resolutionMultiplier = 1;
 
         [FoldoutGroup("スクリーンショット設定")]
-        [SerializeField, Tooltip("Sceneビュー視点からのスクリーンショットの解像度倍率")]
-        [Range(1, 4)]
-        [LabelText("Sceneビュー視点解像度倍率")]
-        private int sceneViewResolutionMultiplier = 2;
-
-        [FoldoutGroup("スクリーンショット設定")]
         [SerializeField, Tooltip("スクリーンショット時にUIを非表示にするかどうか")]
         [LabelText("UIを非表示にする")]
         [ToggleLeft]
@@ -82,9 +76,6 @@ namespace Dread.Util
             {
                 Directory.CreateDirectory(fullPath);
             }
-
-            // シーン遷移で破棄されないようにする
-            DontDestroyOnLoad(gameObject);
         }
 
         /// <summary>
