@@ -14,6 +14,8 @@ namespace Dread.Battle.Util
     {
         private static T _instance;
 
+        private static bool isGameQuitting = false;
+
         /// <summary>
         /// インスタンスを取得します。
         /// シーン内に存在しない場合はnullを返します。
@@ -24,12 +26,23 @@ namespace Dread.Battle.Util
             {
                 if (_instance == null)
                 {
-                    Debug.LogError(
-                        $"{typeof(T).Name}のインスタンスが存在しません。シーン内に{typeof(T).Name}をアタッチしたゲームオブジェクトを配置してください。"
-                    );
+                    if (!isGameQuitting)
+                    {
+                        Debug.LogError(
+                            $"{typeof(T).Name}のインスタンスが存在しません。シーン内に{typeof(T).Name}をアタッチしたゲームオブジェクトを配置してください。"
+                        );
+                    }
                 }
                 return _instance;
             }
+        }
+
+        /// <summary>
+        /// アプリケーション終了時に終了中状態を設定
+        /// </summary>
+        private void OnApplicationQuit()
+        {
+            isGameQuitting = true;
         }
 
         protected virtual void Awake()

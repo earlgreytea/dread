@@ -309,7 +309,7 @@ namespace Dread.Battle.Turret
                 FxEmitter.Instance.EmitByType(FxType.MuzzleFlash, muzzle.position, direction);
 
                 // 発射ログ
-                Debug.Log($"砲塔が弾を発射: 位置={muzzle.position}, 方向={direction}");
+                //                Debug.Log($"砲塔が弾を発射: 位置={muzzle.position}, 方向={direction}");
             }
             else
             {
