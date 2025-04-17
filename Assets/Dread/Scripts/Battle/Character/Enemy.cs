@@ -40,9 +40,9 @@ namespace Dread.Battle.Character
         /// <summary>
         /// 更新処理
         /// </summary>
-        protected override void Update()
+        protected override void FixedUpdate()
         {
-            base.Update();
+            base.FixedUpdate();
 
             if (isActive && IsAlive)
             {

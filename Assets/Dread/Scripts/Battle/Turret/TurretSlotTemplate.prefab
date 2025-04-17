@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2521906715697136532}
   - component: {fileID: 2357361157571403688}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: SlotBoxView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -96,9 +96,10 @@ GameObject:
   m_Component:
   - component: {fileID: 8378055984714492301}
   - component: {fileID: 486206342486125937}
+  - component: {fileID: 3766540034266676069}
   m_Layer: 0
   m_Name: TurretSlotTemplate
-  m_TagString: Untagged
+  m_TagString: TurretSlot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -133,4 +134,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridX: 0
   gridZ: 0
-  currentTurret: {fileID: 0}
+  currentTurretLogic: {fileID: 0}
+  turretDeck: {fileID: 0}
+  useTestTurretData: {fileID: 11400000, guid: 0b66bf25e7f96ad43bd12ba89621f6cb, type: 2}
+--- !u!65 &3766540034266676069
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5509012727480794412}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 5, y: 3, z: 5}
+  m_Center: {x: 0, y: 1.5, z: 0}

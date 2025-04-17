@@ -1,10 +1,10 @@
 {
   "MonoBehaviour": {
     "Version": 4,
-    "EnableBurstCompilation": false,
+    "EnableBurstCompilation": true,
     "EnableOptimisations": true,
     "EnableSafetyChecks": false,
-    "EnableDebugInAllBuilds": true,
+    "EnableDebugInAllBuilds": false,
     "DebugDataKind": 1,
     "EnableArmv9SecurityFeatures": false,
     "CpuMinTargetX32": 0,

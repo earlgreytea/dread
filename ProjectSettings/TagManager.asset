@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - Enemy
+  - TurretDeck
+  - TurretSlot
+  - TurretView
   layers:
   - Default
   - TransparentFX

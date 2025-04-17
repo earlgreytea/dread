@@ -84,7 +84,7 @@ namespace Dread.Battle.Spawner
         /// <summary>
         /// 更新処理
         /// </summary>
-        private void Update()
+        private void FixedUpdate()
         {
             if (!isSpawning)
                 return;
@@ -97,7 +97,7 @@ namespace Dread.Battle.Spawner
             }
 
             // スポーンタイマーの更新
-            spawnTimer -= Time.deltaTime;
+            spawnTimer -= Time.fixedDeltaTime;
             if (spawnTimer <= 0f)
             {
                 SpawnEnemy();

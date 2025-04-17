@@ -1,30 +1,19 @@
 // タレットを配置するための場所やスロットを管理する
 
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
 namespace Dread.Battle.Turret
 {
+    /// <summary>
+    /// タレットを配置するための場所やスロットを管理する
+    /// </summary>
     public class TurretDeck : MonoBehaviour
     {
-        [Header("グリッド設定")]
-        [Tooltip("グリッドの1マスのサイズ")]
-        [SerializeField]
-        private float cellSize = 2.0f;
-
-        [Tooltip("グリッドの横方向のマス数")]
-        [SerializeField, Min(1)]
-        private int gridWidth = 5;
-
-        [Tooltip("グリッドの縦方向のマス数")]
-        [SerializeField, Min(1)]
-        private int gridHeight = 3;
-
-        [Tooltip("グリッドの色")]
-        [SerializeField]
-        private Color gridColor = new Color(0.2f, 0.8f, 0.2f, 0.5f);
+        [Header("パラメータ設定")]
+        [SerializeField, Required]
+        private TurretDeckParameters parameters;
 
         [Header("タレットスロット設定")]
         [Tooltip("タレットスロットのPrefab")]
@@ -33,7 +22,13 @@ namespace Dread.Battle.Turret
         private GameObject turretSlotPrefab;
 
         // タレットのスロットを管理する
-        public List<TurretSlot> slots = new List<TurretSlot>();
+        [SerializeField, ReadOnly, LabelText("配下のタレットスロットリスト")]
+        private List<TurretSlot> slots = new List<TurretSlot>();
+
+        // 防空範囲内の敵キャッシュ
+        [ShowInInspector, ReadOnly, ListDrawerSettings(ShowIndexLabels = true)]
+        [LabelText("現在防空範囲内の敵リスト")]
+        private readonly List<GameObject> enemiesInDefenseRange = new List<GameObject>();
 
         private void Awake()
         {
@@ -49,9 +44,9 @@ namespace Dread.Battle.Turret
             ClearExistingSlots();
 
             // 各グリッド位置にスロットを生成
-            for (int x = 0; x < gridWidth; x++)
+            for (int x = 0; x < parameters.gridWidth; x++)
             {
-                for (int z = 0; z < gridHeight; z++)
+                for (int z = 0; z < parameters.gridHeight; z++)
                 {
                     CreateTurretSlotAt(x, z);
                 }
@@ -110,20 +105,15 @@ namespace Dread.Battle.Turret
             slotObject.name = $"TurretSlot_X{x}_Z{z}";
 
             // TurretSlotコンポーネントを取得
-            TurretSlot turretSlot = slotObject.GetComponent<TurretSlot>();
-            if (turretSlot == null)
+            if (!slotObject.TryGetComponent(out TurretSlot turretSlot))
             {
                 Debug.LogError("プレハブにTurretSlotコンポーネントが含まれていません");
                 Destroy(slotObject);
                 return;
             }
 
-            // グリッド座標を設定
-            if (turretSlot != null)
-            {
-                turretSlot.GridX = x;
-                turretSlot.GridZ = z;
-            }
+            // スロットの初期設定
+            turretSlot.InitialSetup(this, x, z);
 
             // リストに追加
             slots.Add(turretSlot);
@@ -137,7 +127,7 @@ namespace Dread.Battle.Turret
         /// <returns>ワールド座標での中心位置</returns>
         public Vector3 GetCellCenter(int x, int z)
         {
-            if (x < 0 || x >= gridWidth || z < 0 || z >= gridHeight)
+            if (x < 0 || x >= parameters.gridWidth || z < 0 || z >= parameters.gridHeight)
             {
                 Debug.LogWarning($"セル座標が範囲外です: ({x}, {z})");
                 return Vector3.zero;
@@ -146,14 +136,18 @@ namespace Dread.Battle.Turret
             // グリッドの原点（左下）
             Vector3 gridOrigin =
                 transform.position
-                - new Vector3((gridWidth * cellSize) / 2.0f, 0, (gridHeight * cellSize) / 2.0f);
+                - new Vector3(
+                    (parameters.gridWidth * parameters.cellSize) / 2.0f,
+                    0,
+                    (parameters.gridHeight * parameters.cellSize) / 2.0f
+                );
 
             // セルの中心に移動
             return gridOrigin
                 + new Vector3(
-                    (x * cellSize) + (cellSize / 2.0f),
+                    (x * parameters.cellSize) + (parameters.cellSize / 2.0f),
                     0,
-                    (z * cellSize) + (cellSize / 2.0f)
+                    (z * parameters.cellSize) + (parameters.cellSize / 2.0f)
                 );
         }
 
@@ -168,37 +162,85 @@ namespace Dread.Battle.Turret
             // グリッドの原点（左下）
             Vector3 gridOrigin =
                 position
-                - new Vector3((gridWidth * cellSize) / 2.0f, 0, (gridHeight * cellSize) / 2.0f);
+                - new Vector3(
+                    (parameters.gridWidth * parameters.cellSize) / 2.0f,
+                    0,
+                    (parameters.gridHeight * parameters.cellSize) / 2.0f
+                );
 
             // グリッドの色を設定
-            Gizmos.color = gridColor;
+            Gizmos.color = parameters.gridColor;
 
             // 横方向のライン
-            for (int z = 0; z <= gridHeight; z++)
+            for (int z = 0; z <= parameters.gridHeight; z++)
             {
-                Vector3 start = gridOrigin + new Vector3(0, 0, z * cellSize);
-                Vector3 end = start + new Vector3(gridWidth * cellSize, 0, 0);
+                Vector3 start = gridOrigin + new Vector3(0, 0, z * parameters.cellSize);
+                Vector3 end = start + new Vector3(parameters.gridWidth * parameters.cellSize, 0, 0);
                 Gizmos.DrawLine(start, end);
             }
 
             // 縦方向のライン
-            for (int x = 0; x <= gridWidth; x++)
+            for (int x = 0; x <= parameters.gridWidth; x++)
             {
-                Vector3 start = gridOrigin + new Vector3(x * cellSize, 0, 0);
-                Vector3 end = start + new Vector3(0, 0, gridHeight * cellSize);
+                Vector3 start = gridOrigin + new Vector3(x * parameters.cellSize, 0, 0);
+                Vector3 end =
+                    start + new Vector3(0, 0, parameters.gridHeight * parameters.cellSize);
                 Gizmos.DrawLine(start, end);
             }
 
             // セルの中心点を表示
             Gizmos.color = new Color(1f, 0.5f, 0f, 0.8f); // オレンジ色
-            for (int x = 0; x < gridWidth; x++)
+            for (int x = 0; x < parameters.gridWidth; x++)
             {
-                for (int z = 0; z < gridHeight; z++)
+                for (int z = 0; z < parameters.gridHeight; z++)
                 {
                     Vector3 cellCenter = GetCellCenter(x, z);
                     Gizmos.DrawSphere(cellCenter, 0.1f);
                 }
             }
+
+            // 防空範囲を表示
+            Gizmos.color = new Color(0.1f, 0.9f, 1f, 0.3f);
+            Gizmos.DrawLine(
+                transform.position,
+                transform.position + transform.forward * parameters.defenseDistance
+            );
+            Gizmos.DrawSphere(
+                transform.position + transform.forward * parameters.defenseDistance,
+                parameters.defenseRadius
+            );
         }
+
+        /// <summary>
+        /// 毎フレーム、防空範囲内の敵をサーチしキャッシュ
+        /// </summary>
+        private void FixedUpdate()
+        {
+            SearchEnemiesInDefenseRange();
+        }
+
+        /// <summary>
+        /// 防空範囲内の敵を検索しキャッシュする
+        /// </summary>
+        private void SearchEnemiesInDefenseRange()
+        {
+            enemiesInDefenseRange.Clear();
+            var enemies = Character.EnemyController.Instance.GetEnemiesInSphere(
+                transform.position + transform.forward * parameters.defenseDistance,
+                parameters.defenseRadius
+            );
+            foreach (var enemy in enemies)
+            {
+                if (enemy != null)
+                {
+                    enemiesInDefenseRange.Add(enemy.gameObject);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 現在キャッシュされている防空範囲内の敵リストを取得
+        /// </summary>
+        public IReadOnlyList<GameObject> EnemiesInDefenseRange => enemiesInDefenseRange;
     }
 }

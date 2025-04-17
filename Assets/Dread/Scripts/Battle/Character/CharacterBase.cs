@@ -46,12 +46,12 @@ namespace Dread.Battle.Character
         /// <summary>
         /// 更新処理
         /// </summary>
-        protected virtual void Update()
+        protected virtual void FixedUpdate()
         {
             // 無敵時間の更新
             if (invincibilityTimer > 0)
             {
-                invincibilityTimer -= Time.deltaTime;
+                invincibilityTimer -= Time.fixedDeltaTime;
             }
         }
 

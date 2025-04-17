@@ -86,6 +86,27 @@ namespace Dread.Battle.Character
         }
 
         /// <summary>
+        /// 指定した中心点・半径内にいる敵リストを返す
+        /// </summary>
+        public List<Enemy> GetEnemiesInSphere(Vector3 center, float radius)
+        {
+            List<Enemy> result = new List<Enemy>();
+            float sqrRadius = radius * radius;
+            foreach (var enemy in enemies)
+            {
+                if (enemy != null && enemy.IsAlive)
+                {
+                    float sqrDist = (enemy.transform.position - center).sqrMagnitude;
+                    if (sqrDist <= sqrRadius)
+                    {
+                        result.Add(enemy);
+                    }
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
         /// 指定した位置から最も近い敵を取得するメソッド
         /// </summary>
         public Enemy GetNearestEnemy(Vector3 position)
@@ -156,7 +177,7 @@ namespace Dread.Battle.Character
         /// <summary>
         /// 更新処理（無効な参照を定期的に削除）
         /// </summary>
-        private void Update()
+        private void FixedUpdate()
         {
             CleanupEnemyList();
         }

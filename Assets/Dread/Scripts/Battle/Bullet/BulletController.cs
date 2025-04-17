@@ -6,6 +6,7 @@ using Dread.Battle.Fx;
 using Dread.Battle.Collision;
 using Dread.Battle.Util;
 using Sirenix.OdinInspector;
+using Dread.Battle.Turret;
 
 namespace Dread.Battle.Bullet
 {

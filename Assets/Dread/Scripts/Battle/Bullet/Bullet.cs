@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Runtime.InteropServices;
+using Dread.Battle.Turret;
 
 namespace Dread.Battle.Bullet
 {
@@ -113,18 +114,6 @@ namespace Dread.Battle.Bullet
         {
             isActive = false;
         }
-    }
-
-    /// <summary>
-    /// 弾の種類を表す列挙型
-    /// </summary>
-    public enum BulletType
-    {
-        Normal, // 通常弾
-        Piercing, // 貫通弾
-        Explosive, // 爆発弾
-        Homing, // 誘導弾
-        Laser // レーザー
     }
 
     /// <summary>

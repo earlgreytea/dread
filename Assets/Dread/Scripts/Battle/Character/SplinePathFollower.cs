@@ -117,7 +117,7 @@ namespace Dread.Battle.Character
         /// <summary>
         /// 更新処理
         /// </summary>
-        private void Update()
+        private void FixedUpdate()
         {
             if (!isMoving || currentSpline == null)
                 return;
@@ -127,7 +127,7 @@ namespace Dread.Battle.Character
 
             if (reverseDirection)
             {
-                currentDistance -= speedFactor * Time.deltaTime;
+                currentDistance -= speedFactor * Time.fixedDeltaTime;
                 if (currentDistance <= 0f)
                 {
                     currentDistance = 0f;
@@ -144,7 +144,7 @@ namespace Dread.Battle.Character
             }
             else
             {
-                currentDistance += speedFactor * Time.deltaTime;
+                currentDistance += speedFactor * Time.fixedDeltaTime;
                 if (currentDistance >= 1f)
                 {
                     if (loopPath)
