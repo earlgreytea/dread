@@ -11,6 +11,40 @@ namespace Dread.Battle.Turret
     /// </summary>
     public class TurretSlot : MonoBehaviour
     {
+        /// <summary>
+        /// タレットを配置するスロットを押すと呼び出されます
+        /// </summary>
+        private void OnMouseDown()
+        {
+            Debug.LogWarning($"TurretSlot {GridX}, {GridZ} クリック！{turretDeck.name}");
+            // タレットを配置します
+            PlaceTurret(useTestTurretData);
+        }
+
+        private void OnMouseOver()
+        {
+            Debug.LogWarning($"TurretSlot {GridX}, {GridZ} マウスオーバー {turretDeck.name}");
+        }
+
+        private void OnMouseEnter()
+        {
+            clickableBoxRenderer.material.SetColor("_EmissionColor", hoverColor);
+        }
+
+        private void OnMouseExit()
+        {
+            clickableBoxRenderer.material.SetColor("_EmissionColor", defaultColor);
+        }
+
+        [SerializeField]
+        private MeshRenderer clickableBoxRenderer;
+
+        [SerializeField, ColorUsage(false, true)]
+        private Color defaultColor;
+
+        [SerializeField, ColorUsage(false, true)]
+        private Color hoverColor;
+
         [Header("グリッド情報")]
         [SerializeField, ReadOnly]
         private int gridX;
@@ -71,12 +105,7 @@ namespace Dread.Battle.Turret
             this.turretDeck = turretDeck;
         }
 
-        void Start()
-        {
-            // タレットをテスト配置します
-            // テスト配置のデバッグログ
-            PlaceTurret(useTestTurretData);
-        }
+        void Start() { }
 
         /// <summary>
         /// タレットを配置する
@@ -100,7 +129,7 @@ namespace Dread.Battle.Turret
             // TurretLogicを付与
             currentTurretLogic = turret.AddComponent<TurretLogic>();
             // TurretLogicのセットアップ
-            currentTurretLogic.InitialSetup(turretData, turretView);
+            currentTurretLogic.InitialSetup(turretData, turretView, turretDeck);
 
             return true;
         }
@@ -109,11 +138,15 @@ namespace Dread.Battle.Turret
         /// タレットを撤去する
         /// </summary>
         /// <returns>撤去したタレット、タレットがない場合はnull</returns>
-        public TurretLogic RemoveTurret()
+        public bool RemoveTurret()
         {
-            TurretLogic removedTurret = currentTurretLogic;
+            // タレットがない場合は失敗
+            if (currentTurretLogic == null)
+                return false;
+            // オブジェクトの破棄
+            Destroy(currentTurretLogic.gameObject);
             currentTurretLogic = null;
-            return removedTurret;
+            return true;
         }
     }
 }

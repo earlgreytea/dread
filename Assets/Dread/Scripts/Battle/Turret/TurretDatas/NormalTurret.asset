@@ -16,16 +16,14 @@ MonoBehaviour:
   description: "\u6700\u3082\u6A19\u6E96\u7684\u306A\u30BF\u30EC\u30C3\u30C8\u3002"
   icon: {fileID: 0}
   turretViewPrefab: {fileID: 6592763576783066192, guid: ea803dd75f80e314ea82f639080b4f99, type: 3}
-  rotationSpeed: 5
-  horizontalAngleLimit: 60
-  fullRotation: 1
-  verticalAngleLimit: 60
-  fireRate: 1
-  accuracy: 0.5
+  rotationSpeed: 30
+  verticalAngleLimit: 80
+  fireRate: 8
+  accuracy: 0
   effectiveRange: 150
-  bulletSpeed: 100
-  bulletDamage: 1
-  bulletLifetime: 3
-  bulletMaxDistance: 300
-  bulletSize: 0.3
-  bulletType: 0
+  bulletParams:
+    BulletSpeed: 200
+    BulletMaxDistance: 300
+    BulletDamage: 10
+    BulletSize: 1
+    BulletType: 0

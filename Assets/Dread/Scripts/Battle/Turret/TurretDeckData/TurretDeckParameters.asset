@@ -15,6 +15,10 @@ MonoBehaviour:
   cellSize: 5
   gridWidth: 2
   gridHeight: 3
-  gridColor: {r: 0.2, g: 0.8, b: 0.2, a: 0.5}
-  defenseDistance: 100
-  defenseRadius: 100
+  defenseDistance: 60
+  defenseRadius: 80
+  gridColor: {r: 0.9593643, g: 1, b: 0, a: 1}
+  defenseRangeColor: {r: 0.1, g: 0.9, b: 1, a: 0.15294118}
+  showEnemiesInDefenseRange: 1
+  showDefenseRange: 1
+  showGrid: 1

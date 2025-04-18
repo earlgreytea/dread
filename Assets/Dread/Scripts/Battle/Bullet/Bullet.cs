@@ -33,31 +33,20 @@ namespace Dread.Battle.Bullet
         /// <summary>
         /// 弾を初期化するメソッド
         /// </summary>
-        public void Initialize(
-            Vector3 pos,
-            Vector3 dir,
-            float spd,
-            float dmg,
-            float life,
-            float maxDist,
-            float sz,
-            Color col,
-            BulletType tp,
-            BulletOwner own
-        )
+        public void Initialize(Vector3 pos, Vector3 dir, BulletParams bulletParam, BulletOwner own)
         {
             position = pos;
             initialPosition = pos;
             direction = dir.normalized;
-            speed = spd;
+            speed = bulletParam.BulletSpeed;
             velocity = direction * speed;
-            damage = dmg;
-            lifetime = life;
-            maxLifetime = life;
-            maxDistance = maxDist;
-            size = sz;
-            color = col;
-            type = tp;
+            damage = bulletParam.BulletDamage;
+            lifetime = bulletParam.BulletMaxDistance / speed;
+            maxLifetime = lifetime;
+            maxDistance = bulletParam.BulletMaxDistance;
+            size = bulletParam.BulletSize;
+            color = Color.white; // TODO: 色を設定暫定
+            type = bulletParam.BulletType;
             owner = own;
             isActive = true;
         }
@@ -97,7 +86,7 @@ namespace Dread.Battle.Bullet
         /// <summary>
         /// 弾が移動した距離を取得するメソッド
         /// </summary>
-        public float GetDistanceTraveled()
+        public readonly float GetDistanceTraveled()
         {
             return Vector3.Distance(initialPosition, position);
         }
@@ -105,7 +94,7 @@ namespace Dread.Battle.Bullet
         /// <summary>
         /// 弾の半径を取得するプロパティ
         /// </summary>
-        public float radius => size * 0.5f;
+        public readonly float Radius => size * 0.5f;
 
         /// <summary>
         /// 弾を非アクティブにするメソッド

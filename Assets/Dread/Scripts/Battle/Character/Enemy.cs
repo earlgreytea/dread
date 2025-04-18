@@ -9,6 +9,16 @@ namespace Dread.Battle.Character
     /// </summary>
     public abstract class Enemy : CharacterBase
     {
+        /// <summary>
+        /// 前フレームの座標
+        /// </summary>
+        public Vector3 PreviousPosition { get; private set; }
+
+        /// <summary>
+        /// 前フレームとの差分ベクトル（偏差射撃に使用）
+        /// </summary>
+        public Vector3 DeltaPosition { get; private set; }
+
         [Header("敵の基本パラメータ")]
         [SerializeField]
         protected int scoreValue = 100;
@@ -30,6 +40,10 @@ namespace Dread.Battle.Character
         {
             base.Awake();
 
+            // 初期化時に現在位置で初期化
+            PreviousPosition = transform.position;
+            DeltaPosition = Vector3.zero;
+
             // EnemyControllerに自身を登録
             if (EnemyController.Instance != null)
             {
@@ -43,6 +57,10 @@ namespace Dread.Battle.Character
         protected override void FixedUpdate()
         {
             base.FixedUpdate();
+
+            // 座標差分を計算
+            DeltaPosition = transform.position - PreviousPosition;
+            PreviousPosition = transform.position;
 
             if (isActive && IsAlive)
             {
@@ -69,7 +87,14 @@ namespace Dread.Battle.Character
             // 敵の死亡処理
             isActive = false;
 
-            // スコア加算などの処理はここに実装
+            // 死亡時に座標情報をリセット（必要に応じて）
+            DeltaPosition = Vector3.zero;
+
+            // スコア加算
+            if (Dread.Battle.Infra.BattleStatusManager.Instance != null)
+            {
+                Dread.Battle.Infra.BattleStatusManager.Instance.AddScore(scoreValue);
+            }
             Debug.Log($"敵が倒された: {gameObject.name} (スコア: {scoreValue})");
 
             // 実際のゲームでは、オブジェクトプールに戻すか、破棄する

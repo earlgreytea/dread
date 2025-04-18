@@ -64,24 +64,19 @@ namespace Dread.Battle.Character
                 // パスフォロワーのプロパティを設定
                 var followerType = pathFollower.GetType();
                 var pathIndexField = followerType.GetField("pathIndex");
-                if (pathIndexField != null)
-                    pathIndexField.SetValue(pathFollower, pathIndex);
+                pathIndexField?.SetValue(pathFollower, pathIndex);
 
                 var reverseDirectionField = followerType.GetField("reverseDirection");
-                if (reverseDirectionField != null)
-                    reverseDirectionField.SetValue(pathFollower, reverseDirection);
+                reverseDirectionField?.SetValue(pathFollower, reverseDirection);
 
                 var loopPathField = followerType.GetField("loopPath");
-                if (loopPathField != null)
-                    loopPathField.SetValue(pathFollower, loopPath);
+                loopPathField?.SetValue(pathFollower, loopPath);
 
                 var lookForwardField = followerType.GetField("lookForward");
-                if (lookForwardField != null)
-                    lookForwardField.SetValue(pathFollower, lookForward);
+                lookForwardField?.SetValue(pathFollower, lookForward);
 
                 var rotationSpeedField = followerType.GetField("rotationSpeed");
-                if (rotationSpeedField != null)
-                    rotationSpeedField.SetValue(pathFollower, rotationSpeed);
+                rotationSpeedField?.SetValue(pathFollower, rotationSpeed);
             }
         }
 

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Dread.Battle.Util
+namespace Dread.Common
 {
     /// <summary>
     /// シングルトンパターンを実装したMonoBehaviourの基底クラス

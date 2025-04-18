@@ -1,5 +1,6 @@
 using UnityEngine;
 using Sirenix.OdinInspector;
+using Dread.Battle.Bullet;
 
 namespace Dread.Battle.Turret
 {
@@ -44,19 +45,23 @@ namespace Dread.Battle.Turret
         public GameObject turretViewPrefab;
 
         [BoxGroup("旋回性能"), LabelText("回転速度")]
-        public float rotationSpeed = 5f;
+        public float rotationSpeed = 30f;
 
-        [BoxGroup("旋回性能"), LabelText("水平方向角度制限")]
-        public float horizontalAngleLimit = 60f;
+        // TODO:必要になったら復活させる性能
+        //        [BoxGroup("旋回性能"), LabelText("水平方向角度制限")]
+        //        public float horizontalAngleLimit = 60f;
 
-        [BoxGroup("旋回性能"), LabelText("360度回転可能")]
-        public bool fullRotation = true;
+        //        [BoxGroup("旋回性能"), LabelText("360度回転可能")]
+        //        public bool fullRotation = true;
 
         [BoxGroup("旋回性能"), LabelText("垂直方向角度制限")]
-        public float verticalAngleLimit = 60f;
+        public float verticalAngleLimit = 70f;
 
         [BoxGroup("発射性能"), LabelText("発射レート（毎秒）")]
         public float fireRate = 1f;
+
+        [BoxGroup("発射性能"), LabelText("偏差射撃有効"), Tooltip("ONで偏差射撃を行う")]
+        public bool enablePredictiveFire = false;
 
         [BoxGroup("発射性能"), LabelText("精度（1.0=高精度）")]
         public float accuracy = 0.5f;
@@ -64,23 +69,8 @@ namespace Dread.Battle.Turret
         [BoxGroup("発射性能"), LabelText("有効射程距離")]
         public float effectiveRange = 150f;
 
-        [BoxGroup("弾性能"), LabelText("弾速")]
-        public float bulletSpeed = 100f;
-
-        [BoxGroup("弾性能"), LabelText("ダメージ")]
-        public float bulletDamage = 1f;
-
-        [BoxGroup("弾性能"), LabelText("弾の生存時間")]
-        public float bulletLifetime = 3f;
-
-        [BoxGroup("弾性能"), LabelText("最大飛距離")]
-        public float bulletMaxDistance = 300f;
-
-        [BoxGroup("弾性能"), LabelText("弾サイズ")]
-        public float bulletSize = 0.3f;
-
-        [BoxGroup("弾性能"), LabelText("弾種")]
-        public BulletType bulletType = BulletType.Normal;
+        [BoxGroup("弾性能"), LabelText("弾パラメータ")]
+        public BulletParams bulletParams = new BulletParams();
 
         /// <summary>
         /// 指定されたGameObjectがTurretViewコンポーネントを持っているかを検証する

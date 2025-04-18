@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2521906715697136532}
   - component: {fileID: 2357361157571403688}
   m_Layer: 0
-  m_Name: SlotBoxView
+  m_Name: ClickableBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -40,7 +40,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3319490614417165203}
-  m_Mesh: {fileID: -4864010258366543401, guid: f510926ca73dbbe4b82cdbbfc39ffefb, type: 3}
+  m_Mesh: {fileID: 4127972430122871651, guid: f510926ca73dbbe4b82cdbbfc39ffefb, type: 3}
 --- !u!23 &2357361157571403688
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -49,12 +49,12 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3319490614417165203}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
+  m_MotionVectors: 2
+  m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
@@ -132,6 +132,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4822ac4f50f5794d9e6a9a1dfae1d5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  clickableBoxRenderer: {fileID: 2357361157571403688}
+  defaultColor: {r: 0, g: 0.8273683, b: 1.370351, a: 1}
+  hoverColor: {r: 81.27391, g: 102.75575, b: 0, a: 1}
   gridX: 0
   gridZ: 0
   currentTurretLogic: {fileID: 0}
@@ -152,7 +155,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3

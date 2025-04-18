@@ -25,10 +25,24 @@ namespace Dread.Battle.Turret
         [SerializeField, ReadOnly, LabelText("配下のタレットスロットリスト")]
         private List<TurretSlot> slots = new List<TurretSlot>();
 
+        // 防空範囲の方向（xz平面、デグレス、0=forward、+右回り）
+        [Header("防空範囲の方向設定")]
+        [Tooltip("防空範囲の方向（xz平面、デグレス、0=forward、+右回り）")]
+        [Range(-180f, 180f)]
+        public float defenseDirectionAngle = 0f;
+
         // 防空範囲内の敵キャッシュ
         [ShowInInspector, ReadOnly, ListDrawerSettings(ShowIndexLabels = true)]
         [LabelText("現在防空範囲内の敵リスト")]
         private readonly List<GameObject> enemiesInDefenseRange = new List<GameObject>();
+
+        /// <summary>
+        /// 現在防空範囲内の敵リストを取得
+        /// </summary>
+        public List<GameObject> GetEnemiesInDefenseRange()
+        {
+            return enemiesInDefenseRange;
+        }
 
         private void Awake()
         {
@@ -154,7 +168,7 @@ namespace Dread.Battle.Turret
         /// <summary>
         /// エディタでグリッドを可視化
         /// </summary>
-        private void OnDrawGizmosSelected()
+        private void OnDrawGizmos()
         {
             // 現在の位置を基準にグリッドを描画
             Vector3 position = transform.position;
@@ -168,47 +182,66 @@ namespace Dread.Battle.Turret
                     (parameters.gridHeight * parameters.cellSize) / 2.0f
                 );
 
-            // グリッドの色を設定
-            Gizmos.color = parameters.gridColor;
-
-            // 横方向のライン
-            for (int z = 0; z <= parameters.gridHeight; z++)
+            // 配置グリッド表示
+            if (parameters.showGrid)
             {
-                Vector3 start = gridOrigin + new Vector3(0, 0, z * parameters.cellSize);
-                Vector3 end = start + new Vector3(parameters.gridWidth * parameters.cellSize, 0, 0);
-                Gizmos.DrawLine(start, end);
-            }
+                Gizmos.color = parameters.gridColor;
 
-            // 縦方向のライン
-            for (int x = 0; x <= parameters.gridWidth; x++)
-            {
-                Vector3 start = gridOrigin + new Vector3(x * parameters.cellSize, 0, 0);
-                Vector3 end =
-                    start + new Vector3(0, 0, parameters.gridHeight * parameters.cellSize);
-                Gizmos.DrawLine(start, end);
-            }
-
-            // セルの中心点を表示
-            Gizmos.color = new Color(1f, 0.5f, 0f, 0.8f); // オレンジ色
-            for (int x = 0; x < parameters.gridWidth; x++)
-            {
-                for (int z = 0; z < parameters.gridHeight; z++)
+                // 横方向のライン
+                for (int z = 0; z <= parameters.gridHeight; z++)
                 {
-                    Vector3 cellCenter = GetCellCenter(x, z);
-                    Gizmos.DrawSphere(cellCenter, 0.1f);
+                    Vector3 start = gridOrigin + new Vector3(0, 0, z * parameters.cellSize);
+                    Vector3 end =
+                        start + new Vector3(parameters.gridWidth * parameters.cellSize, 0, 0);
+                    Gizmos.DrawLine(start, end);
+                }
+
+                // 縦方向のライン
+                for (int x = 0; x <= parameters.gridWidth; x++)
+                {
+                    Vector3 start = gridOrigin + new Vector3(x * parameters.cellSize, 0, 0);
+                    Vector3 end =
+                        start + new Vector3(0, 0, parameters.gridHeight * parameters.cellSize);
+                    Gizmos.DrawLine(start, end);
+                }
+
+                // セルの中心点を表示
+                Gizmos.color = parameters.gridColor;
+                for (int x = 0; x < parameters.gridWidth; x++)
+                {
+                    for (int z = 0; z < parameters.gridHeight; z++)
+                    {
+                        Vector3 cellCenter = GetCellCenter(x, z);
+                        Gizmos.DrawSphere(cellCenter, 0.1f);
+                    }
                 }
             }
 
             // 防空範囲を表示
-            Gizmos.color = new Color(0.1f, 0.9f, 1f, 0.3f);
-            Gizmos.DrawLine(
-                transform.position,
-                transform.position + transform.forward * parameters.defenseDistance
-            );
-            Gizmos.DrawSphere(
-                transform.position + transform.forward * parameters.defenseDistance,
-                parameters.defenseRadius
-            );
+            if (parameters.showDefenseRange)
+            {
+                Gizmos.color = parameters.defenseRangeColor;
+                Vector3 defenseCenter = GetDefenseRangeCenter();
+                Gizmos.DrawLine(transform.position, defenseCenter);
+                Gizmos.DrawSphere(defenseCenter, parameters.defenseRadius);
+                Gizmos.DrawWireSphere(defenseCenter, parameters.defenseRadius);
+            }
+
+            // 防空範囲内の敵を表示
+            if (parameters.showEnemiesInDefenseRange)
+            {
+                if (enemiesInDefenseRange != null && enemiesInDefenseRange.Count > 0)
+                {
+                    Gizmos.color = Color.cyan;
+                    foreach (var enemy in enemiesInDefenseRange)
+                    {
+                        if (enemy != null)
+                        {
+                            Gizmos.DrawWireSphere(enemy.transform.position, 5.0f);
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -225,8 +258,9 @@ namespace Dread.Battle.Turret
         private void SearchEnemiesInDefenseRange()
         {
             enemiesInDefenseRange.Clear();
+            var center = GetDefenseRangeCenter();
             var enemies = Character.EnemyController.Instance.GetEnemiesInSphere(
-                transform.position + transform.forward * parameters.defenseDistance,
+                center,
                 parameters.defenseRadius
             );
             foreach (var enemy in enemies)
@@ -236,6 +270,15 @@ namespace Dread.Battle.Turret
                     enemiesInDefenseRange.Add(enemy.gameObject);
                 }
             }
+        }
+
+        /// <summary>
+        /// 防空範囲の中心点（ワールド座標）を取得
+        /// </summary>
+        private Vector3 GetDefenseRangeCenter()
+        {
+            var direction = Quaternion.Euler(0, defenseDirectionAngle, 0) * transform.forward;
+            return transform.position + direction * parameters.defenseDistance;
         }
 
         /// <summary>

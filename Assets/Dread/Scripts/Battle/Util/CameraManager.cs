@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Cinemachine;
 using Sirenix.OdinInspector;
+using Dread.Common;
 
 namespace Dread.Battle.Util
 {
@@ -12,6 +13,17 @@ namespace Dread.Battle.Util
     [HideMonoScript]
     public class CameraManager : SingletonMonoBehaviour<CameraManager>
     {
+        // ...（既存のフィールド定義はそのまま）
+
+        private void Update()
+        {
+            // マウス中央ボタン（Button2）が押されたら次のカメラへ
+            if (Input.GetMouseButtonDown(2))
+            {
+                SwitchToNextCamera();
+            }
+        }
+
         [BoxGroup("カメラ設定")]
         [SerializeField, Tooltip("シーンカメラの参照")]
         private Camera sceneCamera;

@@ -1,15 +1,10 @@
 using System;
 using System.IO;
-using System.Collections;
-using System.Reflection;
-
 using UnityEngine;
 using Sirenix.OdinInspector;
-using Unity.Cinemachine;
-using Dread.Battle.Util;
+using Dread.Common;
 #if UNITY_EDITOR
 using UnityEditor;
-using UnityEngine.Rendering;
 #endif
 
 namespace Dread.Util

@@ -4,14 +4,16 @@ using Dread.Battle.Bullet;
 using Dread.Battle.Fx;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using PlasticGui.WorkspaceWindow;
 
 namespace Dread.Battle.Turret
 {
     // ターゲット選択方法の列挙型
     public enum TargetingMethod
     {
-        FirstFound, // 最初に見つけた敵を追跡し続ける（従来の動作）
-        NearestEnemy // 常に最も近い敵をターゲットする
+        FirstFound, // 最初に見つけた敵を追跡し続ける
+        NearestEnemy, // 常に最も近い敵をターゲットする
+        FarthestEnemy // 常に最も遠い敵をターゲットする
     }
 
     public class TurretLogic : MonoBehaviour
@@ -22,6 +24,10 @@ namespace Dread.Battle.Turret
         [SerializeField, ReadOnly, LabelText("タレットデータ")]
         TurretData turretData;
 
+        // 親デッキ参照
+        [SerializeField, ReadOnly, LabelText("親デッキの参照")]
+        TurretDeck turretDeck;
+
         // 狙いをつける対象
         [SerializeField]
         Transform target;
@@ -30,47 +36,6 @@ namespace Dread.Battle.Turret
         [SerializeField, Tooltip("FirstFound: 最初に見つけた敵を追跡し続ける、NearestEnemy: 常に最も近い敵をターゲットする")]
         TargetingMethod targetingMethod = TargetingMethod.NearestEnemy;
 
-        [SerializeField]
-        float rotationSpeed = 5f; // 回転速度
-
-        [SerializeField]
-        float horizontalAngleLimit = 60f; // 水平方向の回転制限（度）
-
-        bool fullRotation = true; // 水平方向に360度回転可能かどうか
-
-        [SerializeField]
-        float verticalAngleLimit = 60f; // 垂直方向の回転制限（度）
-
-        // 弾の設定
-        [Header("弾の設定")]
-        [SerializeField]
-        float bulletSpeed = 100f; // 弾の速度
-
-        [SerializeField]
-        float bulletDamage = 1f; // 弾のダメージ
-
-        [SerializeField]
-        float bulletLifetime = 3f; // 弾の生存時間
-
-        [SerializeField]
-        float bulletMaxDistance = 300f; // 弾の最大飛距離
-
-        [SerializeField]
-        float bulletSize = 0.3f; // 弾のサイズ
-
-        [Header("有効射程設定")]
-        [SerializeField, Tooltip("この距離内に敵が存在する場合のみ発砲します。実際の弾の最大飛距離とは異なります")]
-        float effectiveRange = 150f; // 有効射程距離
-
-        [SerializeField]
-        BulletType bulletType = BulletType.Normal; // 弾の種類
-
-        [SerializeField]
-        float fireRate = 1f; // 1秒あたりの発射回数
-
-        [SerializeField, Range(0f, 1f)]
-        float accuracy = 0.5f; // 弾の精度（1.0が完全な精度、0.0が最大のブレ）
-
         float nextFireTime = 0f; // 次に発射可能になる時間
 
         /// <summary>
@@ -78,22 +43,21 @@ namespace Dread.Battle.Turret
         /// </summary>
         /// <param name="turretData"></param>
         /// <param name="turretView"></param>
-        /// <exception cref="System.NotImplementedException"></exception>
-        internal void InitialSetup(TurretData turretData, TurretView turretView)
+        /// <param name="turretDeck"></param>
+        internal void InitialSetup(
+            TurretData turretData,
+            TurretView turretView,
+            TurretDeck turretDeck
+        )
         {
-            if (turretData == null)
-                return;
-            if (turretView == null)
-                return;
             this.turretData = turretData;
             this.turretView = turretView;
+            this.turretDeck = turretDeck;
         }
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
-            FindTarget();
-
             // 発射時間ちょっとブレを与える
             nextFireTime = Random.value;
         }
@@ -104,17 +68,17 @@ namespace Dread.Battle.Turret
             // ターゲット選択方法に応じて処理を分岐
             switch (targetingMethod)
             {
+                // TODO:敵を追跡し続けるメソッドはちょっと待ってね
                 case TargetingMethod.FirstFound:
-                    // 従来の動作：ターゲットがnullの場合のみ新しいターゲットを探す
-                    if (target == null)
-                    {
-                        FindTarget();
-                    }
                     break;
 
                 case TargetingMethod.NearestEnemy:
                     // 常に最も近い敵をターゲットする
                     FindNearestTarget();
+                    break;
+                case TargetingMethod.FarthestEnemy:
+                    // 常に最も遠い敵をターゲットする
+                    FindFarthestTarget();
                     break;
             }
 
@@ -130,48 +94,55 @@ namespace Dread.Battle.Turret
             }
         }
 
-        // 最初に見つけたターゲットを検索するメソッド（従来の動作）
-        void FindTarget()
+        /// <summary>
+        /// 汎用的な距離比較によるターゲット選択
+        /// </summary>
+        private void FindTargetByDistance(
+            System.Func<float, float, bool> compare,
+            float initialValue
+        )
         {
-            // Enemyタグを持つオブジェクトを検索
-            GameObject enemyObject = GameObject.FindGameObjectWithTag("Enemy");
-
-            if (enemyObject != null)
+            if (turretDeck == null)
             {
-                target = enemyObject.transform;
-            }
-        }
-
-        // 最も近いターゲットを検索するメソッド
-        void FindNearestTarget()
-        {
-            // Enemyタグを持つすべてのオブジェクトを検索
-            GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-
-            if (enemies.Length == 0)
-            {
-                // 敵が見つからない場合はターゲットをクリア
                 target = null;
                 return;
             }
-
-            // 最も近い敵を探す
-            Transform nearestEnemy = null;
-            float nearestDistance = float.MaxValue;
-
-            foreach (GameObject enemy in enemies)
+            var enemies = turretDeck.GetEnemiesInDefenseRange();
+            if (enemies == null || enemies.Count == 0)
             {
+                target = null;
+                return;
+            }
+            Transform selectedEnemy = null;
+            float bestValue = initialValue;
+            foreach (var enemy in enemies)
+            {
+                if (enemy == null)
+                    continue;
                 float distance = Vector3.Distance(transform.position, enemy.transform.position);
-
-                if (distance < nearestDistance)
+                if (compare(distance, bestValue))
                 {
-                    nearestDistance = distance;
-                    nearestEnemy = enemy.transform;
+                    bestValue = distance;
+                    selectedEnemy = enemy.transform;
                 }
             }
+            target = selectedEnemy;
+        }
 
-            // 最も近い敵をターゲットに設定
-            target = nearestEnemy;
+        /// <summary>
+        /// 常に最も近い敵をターゲットする
+        /// </summary>
+        private void FindNearestTarget()
+        {
+            FindTargetByDistance((a, b) => a < b, float.MaxValue);
+        }
+
+        /// <summary>
+        /// 常に最も遠い敵をターゲットする
+        /// </summary>
+        private void FindFarthestTarget()
+        {
+            FindTargetByDistance((a, b) => a > b, float.MinValue);
         }
 
         // ターゲットに向けて砲塔を回転させる
@@ -192,57 +163,53 @@ namespace Dread.Battle.Turret
         // 水平方向（Y軸）の回転
         void RotateHorizontally(Vector3 targetDirection)
         {
-            if (turretView == null)
+            if (turretView == null || turretData == null)
                 return;
             // XZ平面での方向ベクトルを計算（Y成分を0にする）
             Vector3 horizontalDirection = new Vector3(targetDirection.x, 0f, targetDirection.z);
 
-            float currentAngle = Vector3.SignedAngle(
-                turretView.GetTurretBase().forward,
-                horizontalDirection,
-                Vector3.up
-            );
-
-            if (fullRotation || Mathf.Abs(currentAngle) <= horizontalAngleLimit)
-            {
-                Quaternion targetRotation = Quaternion.LookRotation(
-                    horizontalDirection,
-                    Vector3.up
-                );
-                turretView.RotateBase(targetRotation, rotationSpeed);
-            }
+            Quaternion targetRotation = Quaternion.LookRotation(horizontalDirection);
+            turretView.RotateBase(targetRotation, turretData.rotationSpeed * Time.deltaTime);
         }
 
         // 垂直方向（X軸）の回転
         void RotateVertically(Vector3 targetDirection)
         {
-            if (turretView == null)
+            if (turretView == null || turretData == null)
                 return;
-            float heightDifference = target.position.y - turretView.GetBarrel().position.y;
-            float horizontalDistance = new Vector3(
-                targetDirection.x,
-                0f,
-                targetDirection.z
-            ).magnitude;
-            float elevationAngle =
-                Mathf.Atan2(heightDifference, horizontalDistance) * Mathf.Rad2Deg;
-            elevationAngle = -elevationAngle;
-            elevationAngle = Mathf.Clamp(elevationAngle, -verticalAngleLimit, verticalAngleLimit);
-            Quaternion targetRotation = Quaternion.Euler(elevationAngle, 0f, 0f);
-            turretView.RotateBarrel(targetRotation, rotationSpeed);
+
+            Vector3 flatTargetDir = new Vector3(targetDirection.x, 0f, targetDirection.z);
+            float flatDist = flatTargetDir.magnitude;
+            float verticalAngle = -Mathf.Atan2(targetDirection.y, flatDist) * Mathf.Rad2Deg;
+
+            // 回転制限
+            verticalAngle = Mathf.Clamp(
+                verticalAngle,
+                -turretData.verticalAngleLimit,
+                turretData.verticalAngleLimit
+            );
+
+            // バレルのローカルX軸のみ回転させる
+            Quaternion targetLocalRotation = Quaternion.Euler(verticalAngle, 0f, 0f);
+            Transform barrel = turretView.GetBarrel();
+            barrel.localRotation = Quaternion.Slerp(
+                barrel.localRotation,
+                targetLocalRotation,
+                turretData.rotationSpeed * Time.deltaTime
+            );
         }
 
         // ターゲットが有効射程内にいるかチェック
         bool IsTargetInRange()
         {
-            if (target == null)
+            if (target == null || turretData == null)
                 return false;
 
             // ターゲットとの距離を計算
             float distanceToTarget = Vector3.Distance(transform.position, target.position);
 
             // 有効射程内にいるかどうかを返す
-            return distanceToTarget <= effectiveRange;
+            return distanceToTarget <= turretData.effectiveRange;
         }
 
         // 弾を発射する処理
@@ -252,7 +219,7 @@ namespace Dread.Battle.Turret
             if (Time.time >= nextFireTime)
             {
                 FireBullet();
-                nextFireTime = Time.time + (1f / fireRate); // 次の発射可能時間を設定
+                nextFireTime = Time.time + (1f / turretData.fireRate); // 次の発射可能時間を設定
             }
         }
 
@@ -265,25 +232,42 @@ namespace Dread.Battle.Turret
             if (bulletController != null)
             {
                 Vector3 direction = turretView.GetBarrelForward();
-                if (accuracy < 1.0f)
+                // 偏差射撃有効時はリード計算を行う
+                if (turretData.enablePredictiveFire && target != null)
                 {
-                    float inaccuracy = 1.0f - accuracy;
+                    if (target.TryGetComponent<Character.Enemy>(out var enemy))
+                    {
+                        Vector3 toTarget =
+                            enemy.transform.position - turretView.GetMuzzle().position;
+                        Vector3 targetVelocity = enemy.DeltaPosition / Time.fixedDeltaTime;
+                        float bulletSpeed =
+                            turretData.bulletParams != null
+                                ? turretData.bulletParams.BulletSpeed
+                                : 100f;
+                        float distance = toTarget.magnitude;
+                        float timeToTarget = bulletSpeed > 0 ? distance / bulletSpeed : 0f;
+                        Vector3 predictedPosition =
+                            enemy.transform.position + targetVelocity * timeToTarget;
+                        direction = (
+                            predictedPosition - turretView.GetMuzzle().position
+                        ).normalized;
+                    }
+                }
+                // 精度による拡散は従来通り
+                if (turretData.accuracy < 1.0f)
+                {
+                    float inaccuracy = 1.0f - turretData.accuracy;
                     float maxSpreadAngle = 10f * inaccuracy;
                     float randomAngleX = Random.Range(-maxSpreadAngle, maxSpreadAngle);
                     float randomAngleY = Random.Range(-maxSpreadAngle, maxSpreadAngle);
                     Quaternion spreadRotation = Quaternion.Euler(randomAngleX, randomAngleY, 0);
                     direction = spreadRotation * direction;
                 }
+
                 bulletController.FireBullet(
                     turretView.GetMuzzlePosition(),
                     direction,
-                    bulletSpeed,
-                    bulletDamage,
-                    bulletLifetime,
-                    bulletMaxDistance,
-                    bulletSize,
-                    Color.white,
-                    bulletType,
+                    turretData.bulletParams,
                     BulletOwner.Player
                 );
                 turretView.PlayMuzzleFlash(direction);
@@ -299,7 +283,8 @@ namespace Dread.Battle.Turret
         {
             // 有効射程範囲のみ描画（見た目はView側で描画済み）
             Gizmos.color = new Color(0.5f, 0.5f, 1f, 0.3f); // 青色半透明
-            Gizmos.DrawWireSphere(transform.position, effectiveRange);
+            if (turretData != null)
+                Gizmos.DrawWireSphere(transform.position, turretData.effectiveRange);
         }
 
         #endregion

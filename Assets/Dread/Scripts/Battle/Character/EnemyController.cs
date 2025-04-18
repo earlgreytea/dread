@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using Sirenix.OdinInspector;
-using Dread.Battle.Util;
+using Dread.Common;
 
 namespace Dread.Battle.Character
 {

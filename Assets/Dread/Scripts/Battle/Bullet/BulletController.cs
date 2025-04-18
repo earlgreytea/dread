@@ -1,10 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Dread.Battle.Character;
-using System.Linq;
 using Dread.Battle.Fx;
 using Dread.Battle.Collision;
-using Dread.Battle.Util;
+using Dread.Common;
 using Sirenix.OdinInspector;
 using Dread.Battle.Turret;
 
@@ -134,7 +133,7 @@ namespace Dread.Battle.Bullet
         {
             // 弾の情報を取得
             Vector3 bulletPosition = bullets[bulletIndex].position;
-            float bulletRadius = bullets[bulletIndex].radius;
+            float bulletRadius = bullets[bulletIndex].Radius;
 
             // 敵との衝突判定
 
@@ -175,7 +174,7 @@ namespace Dread.Battle.Bullet
             // CollisionUtilityを使用してHitFlashエフェクトを発生させる
             CollisionUtility.EmitHitEffect(
                 bullets[bulletIndex].position,
-                bullets[bulletIndex].radius,
+                bullets[bulletIndex].Radius,
                 bullets[bulletIndex].direction,
                 enemy
             );
@@ -268,13 +267,7 @@ namespace Dread.Battle.Bullet
         public void FireBullet(
             Vector3 position,
             Vector3 direction,
-            float speed,
-            float damage,
-            float lifetime,
-            float maxDistance,
-            float size,
-            Color color,
-            BulletType type,
+            BulletParams bulletParam,
             BulletOwner owner
         )
         {
@@ -289,18 +282,7 @@ namespace Dread.Battle.Bullet
             int index = availableBulletIndices.Dequeue();
 
             // 弾を初期化
-            bullets[index].Initialize(
-                position,
-                direction,
-                speed,
-                damage,
-                lifetime,
-                maxDistance,
-                size,
-                color,
-                type,
-                owner
-            );
+            bullets[index].Initialize(position, direction, bulletParam, owner);
 
             // アクティブな弾の数を増やす
             activeBulletCount++;

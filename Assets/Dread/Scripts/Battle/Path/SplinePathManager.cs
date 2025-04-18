@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Splines;
 using Sirenix.OdinInspector;
-using Dread.Battle.Util;
+using Dread.Common;
 
 namespace Dread.Battle.Path
 {
