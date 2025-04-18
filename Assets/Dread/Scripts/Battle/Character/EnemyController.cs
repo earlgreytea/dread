@@ -15,7 +15,7 @@ namespace Dread.Battle.Character
         [ShowInInspector, ReadOnly, ListDrawerSettings(ShowIndexLabels = true, ShowPaging = true)]
         [FoldoutGroup("登録済みの敵"), LabelText("登録済みの敵一覧")]
         [InfoBox("このリストは自動的に管理されます。直接編集しないでください。")]
-        private List<Enemy> enemies = new List<Enemy>();
+        private readonly List<Enemy> enemies = new List<Enemy>();
 
         /// <summary>
         /// 初期化処理
@@ -40,7 +40,7 @@ namespace Dread.Battle.Character
                 RegisterEnemy(enemy);
             }
 
-            Debug.Log($"シーン内の敵を{enemies.Count}体登録しました。");
+            DevLog.Log($"シーン内の敵を{enemies.Count}体登録しました。", LogCategory.Enemy);
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Dread.Battle.Character
             if (!enemies.Contains(enemy))
             {
                 enemies.Add(enemy);
-                Debug.Log($"敵を登録しました: {enemy.gameObject.name}");
+                DevLog.Log($"敵を登録しました: {enemy.gameObject.name}", LogCategory.Enemy);
             }
         }
 
@@ -63,7 +63,7 @@ namespace Dread.Battle.Character
             if (enemies.Contains(enemy))
             {
                 enemies.Remove(enemy);
-                Debug.Log($"敵の登録を解除しました: {enemy.gameObject.name}");
+                DevLog.Log($"敵の登録を解除しました: {enemy.gameObject.name}", LogCategory.Enemy);
             }
         }
 

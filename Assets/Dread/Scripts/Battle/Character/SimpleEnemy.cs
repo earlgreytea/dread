@@ -220,6 +220,18 @@ namespace Dread.Battle.Character
                 // パスの終端に到達したら消滅
                 Deactivate();
 
+                // BattleStatusManager経由でplayerShipにダメージを与える（仮ダメージ値:100）
+                var manager = Dread.Battle.Infra.BattleStatusManager.Instance;
+                if (manager != null)
+                {
+                    var ship = manager.PlayerShip;
+                    if (ship != null)
+                    {
+                        Debug.Log("[SimpleEnemy] 敵通過により、ダメージ値: 100");
+                        ship.TakeDamage(100); // 仮のダメージ値
+                    }
+                }
+
                 // 敵オブジェクトを完全に破棄
                 Destroy(gameObject);
             }

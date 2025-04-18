@@ -18,8 +18,9 @@ MonoBehaviour:
   turretViewPrefab: {fileID: 6592763576783066192, guid: ea803dd75f80e314ea82f639080b4f99, type: 3}
   rotationSpeed: 30
   verticalAngleLimit: 80
-  fireRate: 8
-  accuracy: 0
+  fireRate: 4
+  enablePredictiveFire: 0
+  accuracy: 0.5
   effectiveRange: 150
   bulletParams:
     BulletSpeed: 200

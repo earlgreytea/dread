@@ -2,6 +2,7 @@ using UnityEngine;
 using Dread.Common;
 
 using Sirenix.OdinInspector;
+using Dread.Battle.Ship;
 
 namespace Dread.Battle.Infra
 {
@@ -20,6 +21,14 @@ namespace Dread.Battle.Infra
         [PropertyOrder(1)]
         [LabelText("撃墜数")]
         public int DefeatedEnemies { get; private set; }
+
+        [SerializeField, Tooltip("プレイヤー艦(暫定機能)")]
+        private BattleShip playerShip;
+
+        public BattleShip PlayerShip
+        {
+            get { return playerShip; }
+        }
 
         /// <summary>スコアを加算</summary>
         public void AddScore(int value)

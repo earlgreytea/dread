@@ -64,9 +64,9 @@ namespace Dread.Battle.Bullet
         }
 
         /// <summary>
-        /// 更新処理
+        /// 物理フレームごとの更新処理
         /// </summary>
-        private void Update()
+        private void FixedUpdate()
         {
             UpdateBullets();
             CheckCollisions();
@@ -180,7 +180,7 @@ namespace Dread.Battle.Bullet
             );
 
             // 衝突ログの追加
-            Debug.Log($"弾[ID:{bulletIndex}]が{enemy.name}に命中! ダメージ:{bullets[bulletIndex].damage}");
+            //            Debug.Log($"弾[ID:{bulletIndex}]が{enemy.name}に命中! ダメージ:{bullets[bulletIndex].damage}");
 
             // 弾の種類に応じた処理
             switch (bullets[bulletIndex].type)

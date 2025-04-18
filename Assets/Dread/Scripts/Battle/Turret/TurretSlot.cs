@@ -23,7 +23,7 @@ namespace Dread.Battle.Turret
 
         private void OnMouseOver()
         {
-            Debug.LogWarning($"TurretSlot {GridX}, {GridZ} マウスオーバー {turretDeck.name}");
+            //            Debug.LogWarning($"TurretSlot {GridX}, {GridZ} マウスオーバー {turretDeck.name}");
         }
 
         private void OnMouseEnter()
@@ -118,7 +118,7 @@ namespace Dread.Battle.Turret
             if (currentTurretLogic != null)
             {
                 // エラーログ
-                Debug.LogError("Turret is already placed.");
+                DevLog.LogWarning("既にタレットが配置されています。", LogCategory.Turret);
                 return false;
             }
 

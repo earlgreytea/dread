@@ -105,8 +105,9 @@ namespace Dread.Battle.Bullet
                 {
                     bulletRenderDataArray[i].position = bullets[i].position;
                     bulletRenderDataArray[i].direction = bullets[i].direction;
-                    bulletRenderDataArray[i].length = 8f;
-                    bulletRenderDataArray[i].width = 0.25f;
+                    // 弾速によって長さを調整
+                    bulletRenderDataArray[i].length = (bullets[i].speed / 200f) * 8f;
+                    bulletRenderDataArray[i].width = 0.33f;
                     bulletRenderDataArray[i].color = bullets[i].color;
                 }
                 else
