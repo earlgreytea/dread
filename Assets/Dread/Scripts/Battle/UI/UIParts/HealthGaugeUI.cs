@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Dread.Battle;
 using Dread.Battle.Util;
 using Sirenix.OdinInspector;
 
@@ -17,6 +16,12 @@ namespace Dread.Battle.UI
 
         [SerializeField]
         private Slider healthSlider;
+
+        [SerializeField, LabelText("ゲージ塗りつぶしImage")]
+        private Image fillImage;
+
+        [SerializeField, LabelText("体力割合による色グラデーション")]
+        private Gradient healthGradient;
 
         /// <summary>
         /// インスペクタからアサインする体力情報の参照先（IHealthProviderを実装したMonoBehaviour）
@@ -62,6 +67,13 @@ namespace Dread.Battle.UI
             {
                 healthSlider.maxValue = healthProvider.MaxHealth;
                 healthSlider.value = healthProvider.CurrentHealth;
+
+                // 体力割合に応じてFill Imageの色を更新
+                if (fillImage != null && healthGradient != null)
+                {
+                    float ratio = (healthProvider.MaxHealth > 0) ? (float)healthProvider.CurrentHealth / healthProvider.MaxHealth : 0f;
+                    fillImage.color = healthGradient.Evaluate(ratio);
+                }
             }
         }
     }

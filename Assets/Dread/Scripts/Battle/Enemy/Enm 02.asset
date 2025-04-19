@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cbe4343a4eb2c05468bceb4164b0b2c9, type: 3}
-  m_Name: EnemyData-Proto1
+  m_Name: Enm 02
   m_EditorClassIdentifier: 
-  enemyName: "\u30D7\u30ED\u30C8\u6575"
+  enemyName: "\u7D2B\u541B"
   description: 
   icon: {fileID: 0}
-  enemyPrefab: {fileID: 7978769178807368713, guid: 629334dc504b23a4a8bf920e04589c50, type: 3}
+  enemyPrefab: {fileID: 7978769178807368713, guid: 0de9b1233501ae14681e6c88284b74d7, type: 3}
   maxHP: 100
-  moveSpeed: 5
-  scoreValue: 10
-  rewardValue: 5
+  moveSpeed: 100
+  scoreValue: 300
+  rewardValue: 10

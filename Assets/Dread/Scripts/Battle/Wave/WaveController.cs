@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Dread.Battle.Wave;
 using Dread.Battle.Spawner;
-using Dread.Battle.Character;
 using Dread.Common;
 using Sirenix.OdinInspector;
 
@@ -11,6 +11,35 @@ namespace Dread.Battle.Wave
     // ウェーブ全体コントローラー
     public class WaveController : SingletonMonoBehaviour<WaveController>
     {
+        /// <summary>
+        /// 現在のウェーブ情報を取得するプロパティ
+        /// </summary>
+        public WaveInfo CurrentWaveInfo
+        {
+            get
+            {
+                int maxWave = wavesScenario != null ? wavesScenario.Waves.Count : 0;
+                float remaining = GetCurrentWaveRemainingTime();
+                return new WaveInfo(waveIndex, maxWave, remaining);
+            }
+        }
+
+        // 現在ウェーブの残り時間を取得（ウェーブ未開始や終了時は0）
+        private float GetCurrentWaveRemainingTime()
+        {
+            if (
+                !isWaveRunning
+                || wavesScenario == null
+                || waveIndex < 0
+                || waveIndex >= wavesScenario.Waves.Count
+            )
+                return 0f;
+            return Mathf.Max(0, currentWaveRemainingTime);
+        }
+
+        // 現在ウェーブの残り時間を管理する変数
+        private float currentWaveRemainingTime = 0f;
+
         [Header("Wavesシナリオ設定")]
         [SerializeField]
         private WavesScenario wavesScenario;
@@ -94,11 +123,14 @@ namespace Dread.Battle.Wave
 
                 // duration分だけウェーブを継続
                 float elapsed = 0f;
+                currentWaveRemainingTime = wave.duration;
                 while (elapsed < wave.duration)
                 {
                     elapsed += Time.deltaTime;
+                    currentWaveRemainingTime = Mathf.Max(0, wave.duration - elapsed);
                     yield return null;
                 }
+                currentWaveRemainingTime = 0f;
                 DevLog.Log($"Wave終了: {waveIndex + 1}", LogCategory.Spawn);
             }
             DevLog.Log($"全ウェーブ終了: {wavesScenario.name}", LogCategory.Spawn);

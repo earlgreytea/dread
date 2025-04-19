@@ -22,7 +22,7 @@ namespace Dread.Battle.Character
         public float maxHP = 100f;
 
         [BoxGroup("パラメータ"), LabelText("移動速度")]
-        public float moveSpeed = 5f;
+        public float moveSpeed = 50f;
 
         [BoxGroup("パラメータ"), LabelText("撃破スコア")]
         public int scoreValue = 10;

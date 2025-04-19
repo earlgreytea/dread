@@ -86,14 +86,17 @@ namespace Dread.Battle.Wave
                 [LabelText("敵データアセット")]
                 public EnemyData EnemyDataAsset;
 
-                [LabelText("移動速度")]
-                public float moveSpeed = 50f;
-
                 [LabelText("出現数")]
                 public int Count = 10;
 
                 [LabelText("間隔（秒）")]
                 public float Interval = 0.5f;
+
+                // 移動速度補正倍率（必要になったら復活）
+                public float MoveSpeedMultiplier
+                {
+                    get { return 1f; }
+                }
             }
         }
     }

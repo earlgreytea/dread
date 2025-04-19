@@ -13,15 +13,21 @@ MonoBehaviour:
   m_Name: WavesScenarioA
   m_EditorClassIdentifier: 
   Waves:
-  - SpawnInfos:
+  - duration: 10
+    SpawnInfos:
     - EnemyDataAsset: {fileID: 11400000, guid: b68183f409fe3e1458b746f2f3718f46, type: 2}
-      moveSpeed: 50
       Count: 10
       Interval: 0.5
-    duration: 10
-  - SpawnInfos:
-    - EnemyDataAsset: {fileID: 11400000, guid: b68183f409fe3e1458b746f2f3718f46, type: 2}
-      moveSpeed: 100
+  - duration: 10
+    SpawnInfos:
+    - EnemyDataAsset: {fileID: 11400000, guid: a773abf570e0d614da25abb3dbf94709, type: 2}
       Count: 20
       Interval: 0.25
-    duration: 10
+  - duration: 10
+    SpawnInfos:
+    - EnemyDataAsset: {fileID: 11400000, guid: b68183f409fe3e1458b746f2f3718f46, type: 2}
+      Count: 5
+      Interval: 0.5
+    - EnemyDataAsset: {fileID: 11400000, guid: a773abf570e0d614da25abb3dbf94709, type: 2}
+      Count: 5
+      Interval: 0.5

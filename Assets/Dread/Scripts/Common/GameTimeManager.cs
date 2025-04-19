@@ -5,19 +5,12 @@ using Sirenix.OdinInspector;
 namespace Dread.Common
 {
     /// <summary>
-    /// ゲーム全体の時間進行を管理するシングルトン。スロー、停止、加速などに対応。
+    /// UnityのTime系APIを一元管理するシングルトン。
+    /// 独自の時間進行管理は行わず、Time.timeScaleやfixedDeltaTimeの操作のみを提供。
     /// </summary>
     public class GameTimeManager : MonoBehaviour
     {
         public static GameTimeManager Instance { get; private set; }
-
-        [Tooltip("現在のゲーム内時間倍率 (1=通常, 0=停止, 0.5=半分, 2=倍速)")]
-        [ShowInInspector, ReadOnly]
-        public float TimeScale { get; private set; } = 1f;
-
-        private float timeScaleTimer = 0f;
-        private float defaultTimeScale = 1f;
-        private bool isPaused = false;
 
         // === Odin Inspector用のデバッグ表示 ===
         [ShowInInspector, ReadOnly, LabelText("現在のFPS")]
@@ -29,18 +22,7 @@ namespace Dread.Common
         [ShowInInspector, ReadOnly, LabelText("Fixed Timestep (Project設定)")]
         public float UnityFixedTimestep => Time.fixedDeltaTime;
 
-        [ShowInInspector, ReadOnly, LabelText("GameTimeManagerのFixedDeltaTime")]
-        public float ManagedFixedDeltaTime => FixedDeltaTime;
-
-        /// <summary>
-        /// スケール済みのdeltaTime（Update相当）
-        /// </summary>
-        public float DeltaTime => isPaused ? 0f : Time.deltaTime * TimeScale;
-
-        /// <summary>
-        /// スケール済みのfixedDeltaTime（FixedUpdate相当）
-        /// </summary>
-        public float FixedDeltaTime => isPaused ? 0f : Time.fixedDeltaTime * TimeScale;
+        private Coroutine timeScaleTransitionCoroutine;
 
         private void Awake()
         {
@@ -52,57 +34,71 @@ namespace Dread.Common
             Instance = this;
         }
 
-        private void Update()
-        {
-            if (isPaused)
-                return;
-            if (timeScaleTimer > 0f)
-            {
-                timeScaleTimer -= Time.unscaledDeltaTime;
-                if (timeScaleTimer <= 0f)
-                {
-                    SetTimeScale(defaultTimeScale);
-                }
-            }
-        }
-
         /// <summary>
-        /// 時間倍率を設定（一時的なスローや加速も可）
+        /// UnityのTime.timeScaleを設定
         /// </summary>
         /// <param name="scale">倍率（1=通常, 0=停止, 0.5=半分, 2=倍速）</param>
-        /// <param name="duration">0なら永続、0より大きい場合はその秒数だけ適用</param>
-        public void SetTimeScale(float scale, float duration = 0f)
+        public void SetTimeScale(float scale)
         {
-            TimeScale = Mathf.Clamp(scale, 0f, 100f);
-            if (duration > 0f)
-            {
-                timeScaleTimer = duration;
-            }
-            else
-            {
-                timeScaleTimer = 0f;
-            }
+            Time.timeScale = Mathf.Clamp(scale, 0f, 100f);
         }
 
         /// <summary>
-        /// ゲームを一時停止
+        /// Time.timeScaleを指定秒数でスムーズに補間する
+        /// </summary>
+        /// <param name="targetTimeScale">目標TimeScale</param>
+        /// <param name="duration">補間にかける秒数</param>
+        public void StartTimeScaleTransition(float targetTimeScale, float duration)
+        {
+            targetTimeScale = Mathf.Clamp(targetTimeScale, 0f, 100f);
+            duration = Mathf.Max(0.0001f, duration);
+            if (timeScaleTransitionCoroutine != null)
+            {
+                StopCoroutine(timeScaleTransitionCoroutine);
+            }
+            DevLog.Log($"GameTimeManager: TimeScaleトランジション開始: {Time.timeScale} → {targetTimeScale} (duration: {duration})", LogCategory.Time);
+            timeScaleTransitionCoroutine = StartCoroutine(TimeScaleTransitionCoroutine(targetTimeScale, duration));
+        }
+
+        private IEnumerator TimeScaleTransitionCoroutine(float target, float duration)
+        {
+            float start = Time.timeScale;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                Time.timeScale = Mathf.Lerp(start, target, t);
+                yield return null;
+            }
+            Time.timeScale = target;
+            DevLog.Log($"GameTimeManager: TimeScaleトランジション完了: {target}", LogCategory.Time);
+            timeScaleTransitionCoroutine = null;
+        }
+
+        /// <summary>
+        /// UnityのTime.fixedDeltaTimeを設定
+        /// </summary>
+        /// <param name="dt">FixedDeltaTime値（秒）</param>
+        public void SetFixedDeltaTime(float dt)
+        {
+            Time.fixedDeltaTime = Mathf.Max(0.0001f, dt);
+        }
+
+        /// <summary>
+        /// ゲームを一時停止（Time.timeScale = 0）
         /// </summary>
         public void Pause()
         {
-            isPaused = true;
+            Time.timeScale = 0f;
         }
 
         /// <summary>
-        /// ゲームの一時停止を解除
+        /// ゲームを再開（Time.timeScale = 1）
         /// </summary>
         public void Resume()
         {
-            isPaused = false;
+            Time.timeScale = 1f;
         }
-
-        /// <summary>
-        /// 現在一時停止中かどうか
-        /// </summary>
-        public bool IsPaused => isPaused;
     }
 }

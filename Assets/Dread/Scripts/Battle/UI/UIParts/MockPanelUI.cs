@@ -27,10 +27,8 @@ namespace Dread.Battle.UI
         void Update()
         {
             var currentScore = BattleStatusManager.Instance.CurrentScore;
-            var waveCount = 0;
-            var waveMax = 3;
 
-            SetText($"Score: {currentScore}\nWave: {waveCount}/{waveMax}");
+            SetText($"Score: {currentScore}");
         }
     }
 }

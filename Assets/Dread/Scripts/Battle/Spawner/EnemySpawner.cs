@@ -104,7 +104,13 @@ namespace Dread.Battle.Spawner
         {
             if (runtimeSpawnInfo == null)
             {
-                DevLog.LogWarning("スポーン情報が設定されていません。", LogCategory.Spawn);
+                DevLog.LogWarning("EnemySpawner: runtimeSpawnInfoがnullです", LogCategory.Spawn);
+                return;
+            }
+
+            if (runtimeSpawnInfo.EnemyDataAsset == null)
+            {
+                DevLog.LogWarning("EnemySpawner: enemyDataがnullです", LogCategory.Spawn);
                 return;
             }
 
@@ -120,7 +126,11 @@ namespace Dread.Battle.Spawner
             {
                 // パスと移動速度を設定
                 enemy.SetPath(pathIndex);
-                enemy.SetMoveSpeed(runtimeSpawnInfo.moveSpeed);
+                // 基準移動速度と補正倍率を掛けた値を設定
+                float speed =
+                    runtimeSpawnInfo.EnemyDataAsset.moveSpeed
+                    * runtimeSpawnInfo.MoveSpeedMultiplier;
+                enemy.SetMoveSpeed(speed);
 
                 // SplinePathFollowerコンポーネントを取得して設定
                 if (enemyObj.TryGetComponent<SplinePathFollower>(out var pathFollower))
